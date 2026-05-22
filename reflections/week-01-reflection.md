@@ -2,7 +2,7 @@
 
 **Name:** Nathan Perfetti
 
-**Date:** May 21 2026
+**Date:** May 21, 2026
 
 ---
 
@@ -26,7 +26,7 @@ https://github.com/benjamincassidymetro/media-tracker-android/pull/3/commits
 **Reviewed:** *(Brian)*
 
 **Link to my review:**
-https://github.com/Sacchi-X/media-tracker-android/pull/1/changes#r3285410597
+https://github.com/Sacchi-X/media-tracker-android/pull/1
 
 ### What I Looked At
 
