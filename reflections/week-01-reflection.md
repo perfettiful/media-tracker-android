@@ -1,7 +1,7 @@
 # Week 1 Reflection
 
-**Name:**
-**Date:**
+**Name:** Nathan Perfetti
+**Date:** May 21 2026
 
 ---
 
@@ -12,6 +12,8 @@
 
 **Link:**
 
+https://github.com/benjamincassidymetro/media-tracker-android/pull/3/commits
+
 ---
 
 ## Code Review
@@ -20,24 +22,30 @@
      Part 1 is the link — I will verify the review exists on GitHub.
      Part 2 is your written assessment — what you actually looked at and what you found. -->
 
-**Reviewed:** *(pod mate's name)*
+**Reviewed:** *(Brian)*
+
 **Link to my review:**
+https://github.com/Sacchi-X/media-tracker-android/pull/1/changes#r3285410597
 
 ### What I Looked At
 
 <!-- Walk through the code you reviewed. What was the PR trying to do? Which files or
      functions did you focus on? -->
+     He updated some basic setting and imports for the theme layout.
 
 ### What I Noticed
 
 <!-- Be specific. Did you spot a potential bug? A pattern that could cause problems? Something
      done well that you want to call out? "I looked at the ViewModel and everything seemed fine"
      is not specific enough. Name the thing you noticed and explain why it matters. -->
+     I noticed a diff on the gradle properties, unless he was deliberately experiemnting, it seemed like the type of config change the IDE might make and that you wouldn't want to commit and only keep local
 
 ### Comments I Left
 
 <!-- Briefly summarize the comments you left on the PR. If you left a positive comment,
      say what it was. If you left a suggestion, say what you suggested and why. -->
+     
+     I left a question about this diff as it may have been deliberate or accidental, in which he may revert the change.
 
 ---
 
@@ -47,12 +55,15 @@
      what was confusing before, what made it make sense, and how you'd explain it to someone else.
      There are no wrong answers here. -->
 
+I was able to setup Android Studio / AVD on my M3 Macbook relatively painlessly. It was a contrasting DevEx compared to challenges I've had setting up on a Windows machine or even an Intel Mac. The ease of 
+
 ---
 
 ## One Thing I'm Still Confused About
 
 <!-- Be honest. This is the most useful part of the reflection for me — it tells me where to
      spend more time in class. You will not lose points for being confused. -->
+     I'mm a bit confused why we forked from Benjamin's repo, to then direct PRs to that repo. I think it may just be the easiest for him to grade. But I usually associate PRs with actual chnages that would get merged. 
 
 ---
 
@@ -60,6 +71,7 @@
 
 <!-- Did you help a pod mate work through something? Did you discover something cool or frustrating?
      Did something from a previous week finally click? This is a good place to put it. -->
+Brian and Jama are chill and I look forward to working together and helping each other out.
 
 ---
 
