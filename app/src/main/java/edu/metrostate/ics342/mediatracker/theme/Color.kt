@@ -3,9 +3,9 @@ package edu.metrostate.ics342.mediatracker.theme
 import androidx.compose.ui.graphics.Color
 
 // Primary — indigo/violet, "reading app" feel
-val Primary            = Color(0xFF4F46E5)
+val Primary            = Color(0xFF6366F1)
 val OnPrimary          = Color(0xFFFFFFFF)
-val PrimaryContainer   = Color(0xFFE0E7FF)
+val PrimaryContainer   = Color(0xFFE0E0FF)
 val OnPrimaryContainer = Color(0xFF1E1B4B)
 
 // Secondary — warm amber
