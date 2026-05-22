@@ -31,21 +31,21 @@ https://github.com/Sacchi-X/media-tracker-android/pull/1/changes#r3285410597
 
 <!-- Walk through the code you reviewed. What was the PR trying to do? Which files or
      functions did you focus on? -->
-     He updated some basic setting and imports for the theme layout.
+     He updated some basic settings and imports for the theme layout.
 
 ### What I Noticed
 
 <!-- Be specific. Did you spot a potential bug? A pattern that could cause problems? Something
      done well that you want to call out? "I looked at the ViewModel and everything seemed fine"
      is not specific enough. Name the thing you noticed and explain why it matters. -->
-     I noticed a diff on the gradle properties, unless he was deliberately experiemnting, it seemed like the type of config change the IDE might make and that you wouldn't want to commit and only keep local
+     I noticed a diff on the gradle properties, unless he was deliberately experiemnting, it seemed like the type of config change the IDE might make, go unnoticed, and that you wouldn't want to commit and only keep local.
 
 ### Comments I Left
 
 <!-- Briefly summarize the comments you left on the PR. If you left a positive comment,
      say what it was. If you left a suggestion, say what you suggested and why. -->
      
-     I left a question about this diff as it may have been deliberate or accidental, in which he may revert the change.
+     I left a question about diff a diff on this gradle properties as it may have been deliberate or accidental, in which he may revert the change.
 
 ---
 
@@ -55,7 +55,7 @@ https://github.com/Sacchi-X/media-tracker-android/pull/1/changes#r3285410597
      what was confusing before, what made it make sense, and how you'd explain it to someone else.
      There are no wrong answers here. -->
 
-I was able to setup Android Studio / AVD on my M3 Macbook relatively painlessly. It was a contrasting DevEx compared to challenges I've had setting up on a Windows machine or even an Intel Mac. The ease of 
+I was able to setup Android Studio / AVD on my M3 Macbook relatively painlessly. It was a contrasting DevEx compared to challenges I've had setting up on a Windows machine or even an Intel Mac. The ease of setup created mental intertia that lead me to want to tackle the substantive task at hand within the project itself.
 
 ---
 
@@ -63,7 +63,7 @@ I was able to setup Android Studio / AVD on my M3 Macbook relatively painlessly.
 
 <!-- Be honest. This is the most useful part of the reflection for me — it tells me where to
      spend more time in class. You will not lose points for being confused. -->
-     I'mm a bit confused why we forked from Benjamin's repo, to then direct PRs to that repo. I think it may just be the easiest for him to grade. But I usually associate PRs with actual chnages that would get merged. 
+     I'mm a bit confused why we forked from Benjamin's repo, to then direct PRs to that repo. I think it may just be the easiest for him to grade. But I usually associate PRs with actual changes that would get merged. 
 
 ---
 
