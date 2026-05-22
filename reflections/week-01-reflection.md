@@ -63,7 +63,7 @@ I was able to setup Android Studio / AVD on my M3 Macbook relatively painlessly.
 
 <!-- Be honest. This is the most useful part of the reflection for me — it tells me where to
      spend more time in class. You will not lose points for being confused. -->
-     I'mm a bit confused why we forked from Benjamin's repo, to then direct PRs to that repo. I think it may just be the easiest for him to grade. But I usually associate PRs with actual changes that would get merged. 
+     I'm a bit confused why we forked from Benjamin's repo, to then direct PRs to that repo. I think it may just be the easiest for him to grade. But I usually associate PRs with actual changes that would get merged. 
 
 ---
 
