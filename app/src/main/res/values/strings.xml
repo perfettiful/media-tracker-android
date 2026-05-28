@@ -1,12 +1,13 @@
 <resources>
     <string name="app_name">Media Tracker</string>
-    <string name="app_tagline">Track what you read, watch, and discover.</string>
+    <string name="app_tagline">Track what you love</string>
 
     <!-- Auth -->
     <string name="email_label">Email</string>
     <string name="password_label">Password</string>
-    <string name="sign_in_button">Sign In</string>
-    <string name="register_prompt">Don\'t have an account? Register</string>
+    <string name="sign_in_button">Log In</string>
+    <string name="register_prompt">Don\'t have an account?</string>
+    <string name="register_action">Sign Up</string>
     <string name="register_not_implemented">Create Account is not implemented yet.</string>
 
     <!-- Navigation -->

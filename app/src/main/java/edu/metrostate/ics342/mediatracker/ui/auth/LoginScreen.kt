@@ -1,8 +1,12 @@
 package edu.metrostate.ics342.mediatracker.ui.auth
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.SmartDisplay
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -10,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -46,8 +51,27 @@ fun LoginScreen(
         verticalArrangement   = Arrangement.Center,
         horizontalAlignment   = Alignment.CenterHorizontally
     ) {
-        Text(stringResource(edu.metrostate.ics342.mediatracker.R.string.app_name), style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.primary)
+        // brand block: rounded square w/ play icon, title, tagline
+        Surface(
+            shape = RoundedCornerShape(20.dp),
+            color = MaterialTheme.colorScheme.primaryContainer,
+            modifier = Modifier.size(72.dp)
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Icon(
+                    imageVector = Icons.Outlined.SmartDisplay,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier.size(36.dp)
+                )
+            }
+        }
+
+        Spacer(Modifier.height(20.dp))
+
+        Text(stringResource(edu.metrostate.ics342.mediatracker.R.string.app_name),
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.onSurface)
 
         Spacer(Modifier.height(8.dp))
 
@@ -117,8 +141,20 @@ fun LoginScreen(
 
         Spacer(Modifier.height(16.dp))
 
-        TextButton(onClick = onNavigateToRegister) {
-            Text(stringResource(edu.metrostate.ics342.mediatracker.R.string.register_prompt))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = stringResource(edu.metrostate.ics342.mediatracker.R.string.register_prompt),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(Modifier.width(4.dp))
+            Text(
+                text = stringResource(edu.metrostate.ics342.mediatracker.R.string.register_action),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.clickable(onClick = onNavigateToRegister)
+            )
         }
     }
 }
