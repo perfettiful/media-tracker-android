@@ -34,7 +34,7 @@ https://github.com/Sacchi-X/media-tracker-android/pull/2
 <!-- Walk through the code you reviewed. What was the PR trying to do? Which files or
      functions did you focus on? -->
 
-     Biran modified the BottomNav, Navgraph, Routes, and LibraryScreenn files to resvoles the routing bug and UI defects in the Library Screen.
+     Brian modified the BottomNav, Navgraph, Routes, and LibraryScreenn files to resvoles the routing bug and UI defects in the Library Screen.
 
 ### What I Noticed
 
@@ -50,7 +50,7 @@ https://github.com/Sacchi-X/media-tracker-android/pull/2
 <!-- Briefly summarize the comments you left on the PR. If you left a positive comment,
      say what it was. If you left a suggestion, say what you suggested and why. -->
      
-     I most gave praise, and confirmed we both resolved the bugs we discussed today in the smae manner. 
+     I mostly gave praise, and confirmed we both resolved the bugs we discussed today in the same manner. Made other suggestions on style and comments.
 
 
 ---
@@ -61,7 +61,7 @@ https://github.com/Sacchi-X/media-tracker-android/pull/2
      what was confusing before, what made it make sense, and how you'd explain it to someone else.
      There are no wrong answers here. -->
 
-I think this week I appreciated more in-depth debugging tips within Android Studio. This like look up references and auto complete. The lesson was valuable as well, insofar as parsing user reported errors, and figuring out what is truly a bug. 
+I think this week I appreciated more in-depth debugging tips within Android Studio. Such as look up references and auto complete. The lesson was valuable as well, insofar as parsing user reported errors, and figuring out what is truly a bug. 
 
 ---
 
