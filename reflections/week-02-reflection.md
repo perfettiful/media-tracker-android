@@ -1,8 +1,8 @@
-# Week 1 Reflection
+# Week 2 Reflection
 
 **Name:** Nathan Perfetti
 
-**Date:** May 21, 2026
+**Date:** May 28, 2026
 
 ---
 
@@ -13,7 +13,7 @@
 
 **Link:**
 
-https://github.com/benjamincassidymetro/media-tracker-android/pull/3/commits
+https://github.com/perfettiful/media-tracker-android/pull/2/commits
 
 ---
 
@@ -26,27 +26,32 @@ https://github.com/benjamincassidymetro/media-tracker-android/pull/3/commits
 **Reviewed:** *(Brian)*
 
 **Link to my review:**
-https://github.com/Sacchi-X/media-tracker-android/pull/1
+
+https://github.com/Sacchi-X/media-tracker-android/pull/2
 
 ### What I Looked At
 
 <!-- Walk through the code you reviewed. What was the PR trying to do? Which files or
      functions did you focus on? -->
-     He updated some basic settings and imports for the theme layout.
+
+     Biran modified the BottomNav, Navgraph, Routes, and LibraryScreenn files to resvoles the routing bug and UI defects in the Library Screen.
 
 ### What I Noticed
 
 <!-- Be specific. Did you spot a potential bug? A pattern that could cause problems? Something
      done well that you want to call out? "I looked at the ViewModel and everything seemed fine"
      is not specific enough. Name the thing you noticed and explain why it matters. -->
-     I noticed a diff on the gradle properties, unless he was deliberately experiemnting, it seemed like the type of config change the IDE might make, go unnoticed, and that you wouldn't want to commit and only keep local.
+
+     I inspected each file that Ben walked up thru in class to compare that we had both applied his suggestions. As well, I reviewed the fixes for bugs we discussed in our group.
+
 
 ### Comments I Left
 
 <!-- Briefly summarize the comments you left on the PR. If you left a positive comment,
      say what it was. If you left a suggestion, say what you suggested and why. -->
      
-     I left a question about diff a diff on this gradle properties as it may have been deliberate or accidental, in which he may revert the change.
+     I most gave praise, and confirmed we both resolved the bugs we discussed today in the smae manner. 
+
 
 ---
 
@@ -56,7 +61,7 @@ https://github.com/Sacchi-X/media-tracker-android/pull/1
      what was confusing before, what made it make sense, and how you'd explain it to someone else.
      There are no wrong answers here. -->
 
-I was able to setup Android Studio / AVD on my M3 Macbook relatively painlessly. It was a contrasting DevEx compared to challenges I've had setting up on a Windows machine or even an Intel Mac. The ease of setup created mental intertia that lead me to want to tackle the substantive task at hand within the project itself.
+I think this week I appreciated more in-depth debugging tips within Android Studio. This like look up references and auto complete. The lesson was valuable as well, insofar as parsing user reported errors, and figuring out what is truly a bug. 
 
 ---
 
@@ -64,7 +69,8 @@ I was able to setup Android Studio / AVD on my M3 Macbook relatively painlessly.
 
 <!-- Be honest. This is the most useful part of the reflection for me — it tells me where to
      spend more time in class. You will not lose points for being confused. -->
-     I'm a bit confused why we forked from Benjamin's repo, to then direct PRs to that repo. I think it may just be the easiest for him to grade. But I usually associate PRs with actual changes that would get merged. 
+
+     Most of my housekeeping questions for the course were addressed today. I think the broader questions I have arenow how bugs/features will be incrementally approached each session. As well, how that will provide a narrow avenue for me to fully grasp concepts in Jetpack Compose, or properly implement future features. 
 
 ---
 
@@ -72,7 +78,7 @@ I was able to setup Android Studio / AVD on my M3 Macbook relatively painlessly.
 
 <!-- Did you help a pod mate work through something? Did you discover something cool or frustrating?
      Did something from a previous week finally click? This is a good place to put it. -->
-Brian and Jama are chill and I look forward to working together and helping each other out.
+I was glad to get clarification on our weekely routine from Ben at the start of the class. It helped me set a routine for how I want to oorganize my in-class work. I recommened this workflow to Jama and Brian and helped explain how it would be useful given how PRs and brnaching operate within Github.
 
 ---
 
