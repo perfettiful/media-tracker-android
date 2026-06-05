@@ -13,7 +13,7 @@
 
 **Link:**
 
-https://github.com/perfettiful/media-tracker-android/pull/2/commits
+https://github.com/perfettiful/media-tracker-android/pull/3
 
 ---
 
@@ -23,18 +23,18 @@ https://github.com/perfettiful/media-tracker-android/pull/2/commits
      Part 1 is the link — I will verify the review exists on GitHub.
      Part 2 is your written assessment — what you actually looked at and what you found. -->
 
-**Reviewed:** *(Brian)*
+**Reviewed:** *(Jama)*
 
 **Link to my review:**
 
-https://github.com/Sacchi-X/media-tracker-android/pull/2
+https://github.com/JamaRufai/media-tracker-android/pull/2
 
 ### What I Looked At
 
 <!-- Walk through the code you reviewed. What was the PR trying to do? Which files or
      functions did you focus on? -->
 
-     Brian modified the BottomNav, Navgraph, Routes, and LibraryScreenn files to resvoles the routing bug and UI defects in the Library Screen.
+     Jama had several files from last week mixed together on his pr that hadn't been merged into main. But I did find several modfified this evening for the registration screen.
 
 ### What I Noticed
 
@@ -42,7 +42,7 @@ https://github.com/Sacchi-X/media-tracker-android/pull/2
      done well that you want to call out? "I looked at the ViewModel and everything seemed fine"
      is not specific enough. Name the thing you noticed and explain why it matters. -->
 
-     I inspected each file that Ben walked up thru in class to compare that we had both applied his suggestions. As well, I reviewed the fixes for bugs we discussed in our group.
+     I mostly compared the UI and config files for the reg form that we modfieid as a class. As well as files I updated myself to compare.
 
 
 ### Comments I Left
@@ -50,7 +50,7 @@ https://github.com/Sacchi-X/media-tracker-android/pull/2
 <!-- Briefly summarize the comments you left on the PR. If you left a positive comment,
      say what it was. If you left a suggestion, say what you suggested and why. -->
      
-     I mostly gave praise, and confirmed we both resolved the bugs we discussed today in the same manner. Made other suggestions on style and comments.
+     I mostly gave kudos that he had located specific config files that may have been more difficult to find in the directory structure. I think offered suggestions to get his work from the past classes porperly merged into the main branch on his repo. 
 
 
 ---
@@ -61,7 +61,7 @@ https://github.com/Sacchi-X/media-tracker-android/pull/2
      what was confusing before, what made it make sense, and how you'd explain it to someone else.
      There are no wrong answers here. -->
 
-I think this week I appreciated more in-depth debugging tips within Android Studio. Such as look up references and auto complete. The lesson was valuable as well, insofar as parsing user reported errors, and figuring out what is truly a bug. 
+Being only the 3rd class, I was pleased that we delved into the details for the full picture "full stack" of the Kotlin client-server model we'll be using. In the process, I think it gave more more practice with the fundamentals like import/export, declarations/decorators As well, it illuminated some of aspects of the gradel package manager that were murky to me up to this point. 
 
 ---
 
@@ -70,7 +70,10 @@ I think this week I appreciated more in-depth debugging tips within Android Stud
 <!-- Be honest. This is the most useful part of the reflection for me — it tells me where to
      spend more time in class. You will not lose points for being confused. -->
 
-     Most of my housekeeping questions for the course were addressed today. I think the broader questions I have arenow how bugs/features will be incrementally approached each session. As well, how that will provide a narrow avenue for me to fully grasp concepts in Jetpack Compose, or properly implement future features. 
+Like Ben brought up during lecture, I agree this class could have been two (or more) whole lectures. 
+- One focusing strictly on the details of UI composition with mocked data for the Reg form. 
+- Topics with gradel package management would have been their own mini lecture to become fully comforable with using something like retro fix as an http lib. 
+- Then the conceptual architecture for our auth system could take a while to discuss. Much less implementing the specific client-server exchange details for signup/sign in.
 
 ---
 
@@ -78,7 +81,8 @@ I think this week I appreciated more in-depth debugging tips within Android Stud
 
 <!-- Did you help a pod mate work through something? Did you discover something cool or frustrating?
      Did something from a previous week finally click? This is a good place to put it. -->
-I was glad to get clarification on our weekely routine from Ben at the start of the class. It helped me set a routine for how I want to oorganize my in-class work. I recommened this workflow to Jama and Brian and helped explain how it would be useful given how PRs and brnaching operate within Github.
+
+Jama and I maintainly debriefed after lecture, and I was able to assist him further to understand best practices with Github.
 
 ---
 
