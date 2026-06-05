@@ -95,6 +95,7 @@
     <string name="error_password_too_short">Password must be at least 8 characters.</string>
     <string name="error_passwords_dont_match">Passwords don\'t match.</string>
     <string name="error_invalid_email">That doesn\'t look like a valid email.</string>
+    <string name="error_signup_failed">Couldn\'t sign you up. Try again.</string>
 
     <!-- Media -->
     <string name="media_unknown_author">Unknown Author</string>

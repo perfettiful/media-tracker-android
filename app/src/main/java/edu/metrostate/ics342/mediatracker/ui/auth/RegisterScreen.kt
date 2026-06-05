@@ -6,8 +6,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.input.TextFieldLineLimits
-import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -21,60 +21,37 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import edu.metrostate.ics342.mediatracker.R
 import edu.metrostate.ics342.mediatracker.theme.OnPrimaryContainer
 import edu.metrostate.ics342.mediatracker.theme.PrimaryContainer
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(
     onRegisterSuccess: () -> Unit,
     onNavigateToLogin: () -> Unit,
-    viewModel: RegisterViewModel = viewModel()
+    viewModel: RegisterViewModel = viewModel(factory = RegisterViewModel.Factory),
 ) {
-    val displayNameState     = rememberTextFieldState()
-    val usernameState        = rememberTextFieldState()
-    val emailState           = rememberTextFieldState()
-    val passwordState        = rememberTextFieldState()
-    val confirmPasswordState = rememberTextFieldState()
+    val displayName     by viewModel.displayName.collectAsState()
+    val username        by viewModel.username.collectAsState()
+    val email           by viewModel.email.collectAsState()
+    val password        by viewModel.password.collectAsState()
+    val confirmPassword by viewModel.confirmPassword.collectAsState()
+    val state           by viewModel.registerState.collectAsState()
 
-    val state by viewModel.registerState.collectAsState()
     val focusManager = LocalFocusManager.current
 
     LaunchedEffect(state) {
-        if (state is AuthUiState.Success) {
+        if (state is AuthViewModel.AuthUiState.Success) {
             viewModel.resetRegisterState()
             onRegisterSuccess()
         }
     }
 
-    // clear the error as soon as they start fixing whichever field
-    LaunchedEffect(displayNameState, usernameState, emailState, passwordState, confirmPasswordState) {
-        snapshotFlow {
-            displayNameState.text.toString() + "|" +
-            usernameState.text.toString() + "|" +
-            emailState.text.toString() + "|" +
-            passwordState.text.toString() + "|" +
-            confirmPasswordState.text.toString()
-        }.collect { viewModel.clearRegisterError() }
-    }
-
-    val isLoading = state is AuthUiState.Loading
-    val errorMsg  = (state as? AuthUiState.Error)?.msgResId?.let { stringResource(it) }
-
-    fun submit() {
-        focusManager.clearFocus()
-        viewModel.onSignUpClicked(
-            displayName     = displayNameState.text.toString(),
-            username        = usernameState.text.toString(),
-            email           = emailState.text.toString(),
-            password        = passwordState.text.toString(),
-            confirmPassword = confirmPasswordState.text.toString(),
-        )
-    }
+    val isLoading = state is AuthViewModel.AuthUiState.Loading
+    val errorMsg  = (state as? AuthViewModel.AuthUiState.Error)?.msgResId?.let { stringResource(it) }
 
     Column(
         modifier = Modifier
@@ -85,7 +62,6 @@ fun RegisterScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        // smaller header than login (60dp vs 72dp per wireframe)
         Image(
             painter = painterResource(id = R.drawable.smart_display),
             contentDescription = null,
@@ -113,58 +89,76 @@ fun RegisterScreen(
 
         Spacer(Modifier.height(28.dp))
 
-        TextField(
-            state       = displayNameState,
-            modifier    = Modifier.fillMaxWidth(),
-            placeholder = { Text(stringResource(R.string.display_name_label)) },
+        OutlinedTextField(
+            value         = displayName,
+            onValueChange = viewModel::setDisplayName,
+            label         = { Text(stringResource(R.string.display_name_label)) },
+            singleLine    = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-            onKeyboardAction = { focusManager.moveFocus(FocusDirection.Down) },
-            lineLimits  = TextFieldLineLimits.SingleLine,
+            keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
+            modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(Modifier.height(10.dp))
 
-        TextField(
-            state       = usernameState,
-            modifier    = Modifier.fillMaxWidth(),
-            placeholder = { Text(stringResource(R.string.username_label)) },
+        OutlinedTextField(
+            value         = username,
+            onValueChange = viewModel::setUsername,
+            label         = { Text(stringResource(R.string.username_label)) },
+            singleLine    = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-            onKeyboardAction = { focusManager.moveFocus(FocusDirection.Down) },
-            lineLimits  = TextFieldLineLimits.SingleLine,
+            keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
+            modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(Modifier.height(10.dp))
 
-        TextField(
-            state       = emailState,
-            modifier    = Modifier.fillMaxWidth(),
-            placeholder = { Text(stringResource(R.string.email_label)) },
+        OutlinedTextField(
+            value         = email,
+            onValueChange = viewModel::setEmail,
+            label         = { Text(stringResource(R.string.email_label)) },
+            singleLine    = true,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Email,
                 imeAction    = ImeAction.Next,
             ),
-            onKeyboardAction = { focusManager.moveFocus(FocusDirection.Down) },
-            lineLimits  = TextFieldLineLimits.SingleLine,
+            keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
+            modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(Modifier.height(10.dp))
 
-        SecureTextField(
-            state       = passwordState,
-            modifier    = Modifier.fillMaxWidth(),
-            placeholder = { Text(stringResource(R.string.password_label)) },
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-            onKeyboardAction = { focusManager.moveFocus(FocusDirection.Down) },
+        OutlinedTextField(
+            value         = password,
+            onValueChange = viewModel::setPassword,
+            label         = { Text(stringResource(R.string.password_label)) },
+            singleLine    = true,
+            visualTransformation = PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Password,
+                imeAction    = ImeAction.Next,
+            ),
+            keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
+            modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(Modifier.height(10.dp))
 
-        SecureTextField(
-            state       = confirmPasswordState,
-            modifier    = Modifier.fillMaxWidth(),
-            placeholder = { Text(stringResource(R.string.confirm_password_label)) },
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-            onKeyboardAction = { submit() },
+        OutlinedTextField(
+            value         = confirmPassword,
+            onValueChange = viewModel::setConfirmPassword,
+            label         = { Text(stringResource(R.string.confirm_password_label)) },
+            singleLine    = true,
+            visualTransformation = PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Password,
+                imeAction    = ImeAction.Done,
+            ),
+            keyboardActions = KeyboardActions(onDone = {
+                focusManager.clearFocus()
+                viewModel.onSignUpClicked()
+            }),
+            modifier = Modifier.fillMaxWidth()
         )
 
         if (errorMsg != null) {
@@ -179,7 +173,7 @@ fun RegisterScreen(
         Spacer(Modifier.height(20.dp))
 
         Button(
-            onClick  = { submit() },
+            onClick  = { focusManager.clearFocus(); viewModel.onSignUpClicked() },
             enabled  = !isLoading,
             modifier = Modifier.fillMaxWidth().height(48.dp),
         ) {

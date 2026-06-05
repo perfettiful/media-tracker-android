@@ -9,14 +9,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-sealed class AuthUiState {
-    object Idle    : AuthUiState()
-    object Loading : AuthUiState()
-    object Success : AuthUiState()
-    data class Error(val msgResId: Int) : AuthUiState()
-}
-
 class AuthViewModel : ViewModel() {
+
+    sealed class AuthUiState {
+        object Idle    : AuthUiState()
+        object Loading : AuthUiState()
+        object Success : AuthUiState()
+        data class Error(val msgResId: Int) : AuthUiState()
+    }
 
     private val _email    = MutableStateFlow("")
     val email: StateFlow<String> = _email.asStateFlow()
