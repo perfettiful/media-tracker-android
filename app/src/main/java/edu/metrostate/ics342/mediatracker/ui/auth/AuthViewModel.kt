@@ -2,6 +2,7 @@ package edu.metrostate.ics342.mediatracker.ui.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import edu.metrostate.ics342.mediatracker.R
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,8 +17,6 @@ class AuthViewModel : ViewModel() {
         object Success : AuthUiState()
         data class Error(val msgResId: Int) : AuthUiState()
     }
-
-    // ── Login ─────────────────────────────────────────────────────────────
 
     private val _email    = MutableStateFlow("")
     val email: StateFlow<String> = _email.asStateFlow()
@@ -38,11 +37,10 @@ class AuthViewModel : ViewModel() {
             if (_email.value.isNotBlank() && _password.value.isNotBlank()) {
                 _loginState.value = AuthUiState.Success
             } else {
-                _loginState.value = AuthUiState.Error(edu.metrostate.ics342.mediatracker.R.string.error_empty_credentials)
+                _loginState.value = AuthUiState.Error(R.string.error_empty_credentials)
             }
         }
     }
 
     fun resetLoginState() { _loginState.value = AuthUiState.Idle }
-
 }

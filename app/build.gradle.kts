@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 extensions.configure<ApplicationExtension> {
@@ -60,7 +61,9 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.retrofit)
-    implementation(libs.retrofit.converter.gson)
+    implementation(libs.retrofit.converters.kotlinx.serializtion)
+
+implementation(libs.kotlinx.serialization)
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging.interceptor)
     implementation(libs.coil.compose)
