@@ -8,7 +8,13 @@
     <string name="sign_in_button">Log In</string>
     <string name="register_prompt">Don\'t have an account?</string>
     <string name="register_action">Sign Up</string>
-    <string name="register_not_implemented">Create Account is not implemented yet.</string>
+
+    <string name="create_account_title">Create Account</string>
+    <string name="create_account_subtitle">Join the community</string>
+    <string name="display_name_label">Display Name</string>
+    <string name="username_label">Username</string>
+    <string name="confirm_password_label">Confirm Password</string>
+    <string name="login_prompt">Already have an account?</string>
 
     <!-- Navigation -->
     <string name="nav_feed">Feed</string>
@@ -84,6 +90,11 @@
 
     <!-- Errors -->
     <string name="error_empty_credentials">Please enter your email and password.</string>
+    <string name="error_empty_fields">Please fill out every field.</string>
+    <string name="error_username_too_short">Username must be at least 3 characters.</string>
+    <string name="error_password_too_short">Password must be at least 8 characters.</string>
+    <string name="error_passwords_dont_match">Passwords don\'t match.</string>
+    <string name="error_invalid_email">That doesn\'t look like a valid email.</string>
 
     <!-- Media -->
     <string name="media_unknown_author">Unknown Author</string>
