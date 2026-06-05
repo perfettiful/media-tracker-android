@@ -1,5 +1,7 @@
 package edu.metrostate.ics342.mediatracker.ui.auth
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -12,9 +14,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import edu.metrostate.ics342.mediatracker.theme.OnPrimaryContainer
+import edu.metrostate.ics342.mediatracker.theme.PrimaryContainer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -58,20 +63,15 @@ fun RegisterScreen(
     ) {
 
         // smaller header than login (60dp vs 72dp per wireframe)
-        Surface(
-            shape    = RoundedCornerShape(16.dp),
-            color    = MaterialTheme.colorScheme.primaryContainer,
-            modifier = Modifier.size(60.dp)
-        ) {
-            Box(contentAlignment = Alignment.Center) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_smart_display),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                    modifier = Modifier.size(28.dp)
-                )
-            }
-        }
+        Image(
+            painter = painterResource(id = R.drawable.smart_display),
+            contentDescription = null,
+            modifier = Modifier
+                .size(width = 60.dp, height = 60.dp)
+                .background(color = PrimaryContainer, shape = RoundedCornerShape(16.dp))
+                .padding(all = 16.dp),
+            colorFilter = ColorFilter.tint(color = OnPrimaryContainer),
+        )
 
         Spacer(Modifier.height(16.dp))
 
