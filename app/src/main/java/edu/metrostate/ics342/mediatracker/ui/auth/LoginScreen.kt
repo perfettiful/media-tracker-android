@@ -58,7 +58,7 @@ fun LoginScreen(
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Icon(
-                    painter = painterResource(edu.metrostate.ics342.mediatracker.R.drawable.ic_smart_display),
+                    painter = painterResource(edu.metrostate.ics342.mediatracker.R.drawable.smart_display),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.size(36.dp)
