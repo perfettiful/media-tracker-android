@@ -10,7 +10,7 @@
 
 **Link:**
 
-https://github.com/perfettiful/media-tracker-android/pull/3
+https://github.com/perfettiful/media-tracker-android/pull/5
 
 ---
 
@@ -20,7 +20,7 @@ https://github.com/perfettiful/media-tracker-android/pull/3
 
 **Link to my review:**
 
-https://github.com/JamaRufai/media-tracker-android/pull/2
+https://github.com/JamaRufai/media-tracker-android/pull/3/changes
 
 ### What I Looked At
 
