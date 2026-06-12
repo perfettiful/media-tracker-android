@@ -3,16 +3,15 @@ package edu.metrostate.ics342.mediatracker.ui.auth
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import edu.metrostate.ics342.mediatracker.R
 import edu.metrostate.ics342.mediatracker.data.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 
 class RegisterViewModel(
+    // kept around so we can wire userRepository.createAccount(...) when networking lands
     private val userRepository: UserRepository,
 ) : ViewModel() {
 
@@ -67,20 +66,9 @@ class RegisterViewModel(
             return
         }
 
-        viewModelScope.launch {
-            _registerState.value = AuthViewModel.AuthUiState.Loading
-            try {
-                userRepository.createAccount(
-                    displayName = name,
-                    username    = user,
-                    email       = em,
-                    password    = pw,
-                )
-                _registerState.value = AuthViewModel.AuthUiState.Success
-            } catch (e: Throwable) {
-                _registerState.value = AuthViewModel.AuthUiState.Error(R.string.error_signup_failed)
-            }
-        }
+        // validation passed. real network call goes here once we wire it.
+        // for now the screen catches Success and shows a "not implemented" snackbar.
+        _registerState.value = AuthViewModel.AuthUiState.Success
     }
 
     fun resetRegisterState() { _registerState.value = AuthViewModel.AuthUiState.Idle }
