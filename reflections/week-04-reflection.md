@@ -24,39 +24,38 @@ https://github.com/JamaRufai/media-tracker-android/pull/3/changes
 
 ### What I Looked At
 
-     Jama had several files from last week mixed together on his pr that hadn't been merged into main. But I did find several modfified this evening for the registration screen.
+On Jama's PR #3, I specifically looked at the most recent commits. I focused on `RegisterViewModel.kt` since he had deleted it earlier in the same PR and just restored it, plus the corresponding rewire in `RegisterScreen.kt` that points the form back at the VM. Mostly looking at the state model (the `RegisterUiState` sealed class), how the screen consumes it (`collectAsState`, `LaunchedEffect` on Success), and the validation flow inside `onRegisterClick()`.
 
 ### What I Noticed
 
-     I mostly compared the UI and config files for the reg form that we modfieid as a class. As well as files I updated myself to compare.
+- I noticed branch hygiene again, this pr still has commits stretching back to May 22 (week 1 reflection, week 2 bug fixes, etc.) on top of tonight's work. Same shape as last week. Next week he should branch off his local `main` after it catches up, otherwise every PR keeps growing in scope.
+- The `RegisterUiState` sealed class nested in the VM is clean. Idle, Loading, Success, and `Error(val msgResId: Int)` makes the `when` on `_registerState.value` exhaustive. Same pattern Ben walked through.
+- Validation is two rules right now (blank, password mismatch). No email format check, no password length minimum, both cheap to add.
+- `delay(800)` is a fake network call but `UserRepository.kt` and `ApiService.kt` are still empty files from earlier in the same PR. The stub has nowhere to land.
 
 
 ### Comments I Left
 
-     I mostly gave kudos that he had located specific config files that may have been more difficult to find in the directory structure. I think offered suggestions to get his work from the past classes porperly merged into the main branch on his repo. 
+- Left praise on `RegisterViewModel.kt` line 12 for the `RegisterUiState` shape. Nesting the sealed class inside the VM keeps it traveling with the class.
+- Suggested adding an email format check and password length minimum to the validation `when` in `onRegisterClick()`. Server will catch those eventually but no reason not to surface them locally.
 
 
 ---
 
 ## One Thing I Understood More Deeply
 
-
-Being only the 3rd class, I was pleased that we delved into the details for the full picture "full stack" of the Kotlin client-server model we'll be using. In the process, I think it gave more more practice with the fundamentals like import/export, declarations/decorators As well, it illuminated some of aspects of the gradel package manager that were murky to me up to this point. 
+Sealed classes made more sense and seem less obscure now after Ben explained their use in `RegisterUiState` with `Idle / Loading / Success / Error(val msgResId: Int`) inside `RegisterViewModel`. I'd recognized the pattern but thought of it as "enums but with extra steps,", but the `Error` variant carrying a payload while `Idle` carries nothing is the part that matters. A plain enum cannot do that. The other half is exhaustiveness: the `when` expression on `registerState.value` will not compile until every branch is handled, so adding a fifth state later forces the compiler to drag me through every place I read it. That is the fallback mechanism I did not fully understand until Ben broke it down.
 
 ---
 
 ## One Thing I'm Still Confused About
 
-Like Ben brought up during lecture, I agree this class could have been two (or more) whole lectures. 
-- One focusing strictly on the details of UI composition with mocked data for the Reg form. 
-- Topics with gradel package management would have been their own mini lecture to become fully comforable with using something like retro fix as an http lib. 
-- Then the conceptual architecture for our auth system could take a while to discuss. Much less implementing the specific client-server exchange details for signup/sign in.
+The thing I am still stuck on is why `viewModel()` is written as a generic. In `RegisterScreen.kt` the call is `viewModel: RegisterViewModel = viewModel()`, and the tooltip in Studio shows it as `<reified VM>`. I know `reified` means the runtime can see the type, but I do not get why this needs to be a generic function instead of just a regular one that returns my `RegisterViewModel` directly. What does keeping it generic actually buy me, and when would I notice the flexibility it gives?
 
 ---
 
 ## Anything Else *(optional)*
 
-Jama and I maintainly debriefed after lecture, and I was able to assist him further to understand best practices with Github.
 
 ---
 
