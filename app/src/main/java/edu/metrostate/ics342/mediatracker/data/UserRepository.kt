@@ -2,9 +2,9 @@ package edu.metrostate.ics342.mediatracker.data
 
 import edu.metrostate.ics342.mediatracker.BuildConfig
 import edu.metrostate.ics342.mediatracker.data.model.CreateUserRequest
-import edu.metrostate.ics342.mediatracker.data.model.CreateUserResponse
 import edu.metrostate.ics342.mediatracker.data.model.TokenRequest
 import edu.metrostate.ics342.mediatracker.data.model.TokenResponse
+import edu.metrostate.ics342.mediatracker.data.model.UserProfile
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
@@ -32,7 +32,7 @@ class UserRepository {
         username: String,
         email: String,
         password: String,
-    ): CreateUserResponse {
+    ): UserProfile {
         val createUserRequest = CreateUserRequest(
             email        = email,
             password     = password,

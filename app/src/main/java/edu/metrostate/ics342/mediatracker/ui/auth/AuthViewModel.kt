@@ -53,6 +53,7 @@ class AuthViewModel(
             try {
                 val tokens = userRepository.login(em, pw)
                 tokenStore.saveTokens(tokens.accessToken, tokens.refreshToken)
+                tokenStore.saveUser(tokens.user)
                 _loginState.value = AuthUiState.Success
             } catch (e: HttpException) {
                 // 401 is bad creds, anything else is a server hiccup
