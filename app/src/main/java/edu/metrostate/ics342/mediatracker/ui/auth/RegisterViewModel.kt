@@ -3,15 +3,18 @@ package edu.metrostate.ics342.mediatracker.ui.auth
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import edu.metrostate.ics342.mediatracker.R
 import edu.metrostate.ics342.mediatracker.data.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.io.IOException
 
 class RegisterViewModel(
-    // kept around so we can wire userRepository.createAccount(...) when networking lands
     private val userRepository: UserRepository,
 ) : ViewModel() {
 
@@ -66,9 +69,27 @@ class RegisterViewModel(
             return
         }
 
-        // validation passed. real network call goes here once we wire it.
-        // for now the screen catches Success and shows a "not implemented" snackbar.
-        _registerState.value = AuthViewModel.AuthUiState.Success
+        viewModelScope.launch {
+            _registerState.value = AuthViewModel.AuthUiState.Loading
+            try {
+                userRepository.createAccount(
+                    displayName = name,
+                    username    = user,
+                    email       = em,
+                    password    = pw,
+                )
+                _registerState.value = AuthViewModel.AuthUiState.Success
+            } catch (e: HttpException) {
+                // 409 means the email or username is already on file
+                val msg = if (e.code() == 409) R.string.error_email_or_username_taken
+                          else R.string.error_signup_failed
+                _registerState.value = AuthViewModel.AuthUiState.Error(msg)
+            } catch (e: IOException) {
+                _registerState.value = AuthViewModel.AuthUiState.Error(R.string.error_network)
+            } catch (e: Exception) {
+                _registerState.value = AuthViewModel.AuthUiState.Error(R.string.error_signup_failed)
+            }
+        }
     }
 
     fun resetRegisterState() { _registerState.value = AuthViewModel.AuthUiState.Idle }
