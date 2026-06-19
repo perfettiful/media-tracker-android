@@ -15,6 +15,7 @@
     <string name="username_label">Username</string>
     <string name="confirm_password_label">Confirm Password</string>
     <string name="login_prompt">Already have an account?</string>
+    <string name="signup_success">Account created. Log in to continue.</string>
 
     <!-- Navigation -->
     <string name="nav_feed">Feed</string>
@@ -73,7 +74,6 @@
     <!-- Stubs -->
     <string name="search_not_implemented">Search is not implemented yet.</string>
     <string name="detail_not_implemented">Media Detail is not implemented yet.\n(mediaId = %1$d)</string>
-    <string name="signup_not_implemented">Sign Up not implemented yet.</string>
 
     <!-- Library Status -->
     <string name="status_want_to">Want to</string>
@@ -97,6 +97,10 @@
     <string name="error_passwords_dont_match">Passwords don\'t match.</string>
     <string name="error_invalid_email">That doesn\'t look like a valid email.</string>
     <string name="error_signup_failed">Couldn\'t sign you up. Try again.</string>
+    <string name="error_email_or_username_taken">That email or username is already taken.</string>
+    <string name="error_network">Couldn\'t reach the server. Check your connection.</string>
+    <string name="error_invalid_login">Wrong email or password.</string>
+    <string name="error_login_failed">Couldn\'t log you in. Try again.</string>
 
     <!-- Media -->
     <string name="media_unknown_author">Unknown Author</string>

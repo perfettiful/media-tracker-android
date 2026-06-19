@@ -3,15 +3,19 @@ package edu.metrostate.ics342.mediatracker.ui.auth
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import edu.metrostate.ics342.mediatracker.MediaTrackerApp
 import edu.metrostate.ics342.mediatracker.R
+import edu.metrostate.ics342.mediatracker.data.RegisterResult
 import edu.metrostate.ics342.mediatracker.data.UserRepository
+import edu.metrostate.ics342.mediatracker.data.network.DefaultUserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 class RegisterViewModel(
-    // kept around so we can wire userRepository.createAccount(...) when networking lands
     private val userRepository: UserRepository,
 ) : ViewModel() {
 
@@ -66,16 +70,31 @@ class RegisterViewModel(
             return
         }
 
-        // validation passed. real network call goes here once we wire it.
-        // for now the screen catches Success and shows a "not implemented" snackbar.
-        _registerState.value = AuthViewModel.AuthUiState.Success
+        viewModelScope.launch {
+            _registerState.value = AuthViewModel.AuthUiState.Loading
+            val result = userRepository.register(
+                email       = em,
+                password    = pw,
+                username    = user,
+                displayName = name,
+            )
+            _registerState.value = when (result) {
+                RegisterResult.Success      -> AuthViewModel.AuthUiState.Success
+                RegisterResult.Conflict     -> AuthViewModel.AuthUiState.Error(R.string.error_email_or_username_taken)
+                RegisterResult.NetworkError -> AuthViewModel.AuthUiState.Error(R.string.error_network)
+                RegisterResult.UnknownError -> AuthViewModel.AuthUiState.Error(R.string.error_signup_failed)
+            }
+        }
     }
 
     fun resetRegisterState() { _registerState.value = AuthViewModel.AuthUiState.Idle }
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
-            initializer { RegisterViewModel(UserRepository()) }
+            initializer {
+                val app = this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as MediaTrackerApp
+                RegisterViewModel(DefaultUserRepository(app.tokenStore))
+            }
         }
     }
 }

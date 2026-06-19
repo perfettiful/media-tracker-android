@@ -28,7 +28,7 @@ fun UserProfileScreen(
     userId: String,
     onNavigateBack: () -> Unit,
     onMediaClick: (Int) -> Unit,
-    viewModel: ProfileViewModel = viewModel()
+    viewModel: ProfileViewModel = viewModel(factory = ProfileViewModel.Factory)
 ) {
     // Week 10: Replace this with a real GET /users/{id} call from the ViewModel
     val user: UserProfile? = remember(userId) { viewModel.loadUserById(userId) }
