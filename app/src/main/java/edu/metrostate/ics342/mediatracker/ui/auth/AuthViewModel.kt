@@ -7,17 +7,15 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import edu.metrostate.ics342.mediatracker.MediaTrackerApp
 import edu.metrostate.ics342.mediatracker.R
-import edu.metrostate.ics342.mediatracker.data.TokenStore
+import edu.metrostate.ics342.mediatracker.data.LoginResult
 import edu.metrostate.ics342.mediatracker.data.UserRepository
+import edu.metrostate.ics342.mediatracker.data.network.DefaultUserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
-import java.io.IOException
 
 class AuthViewModel(
-    private val tokenStore: TokenStore,
     private val userRepository: UserRepository,
 ) : ViewModel() {
 
@@ -50,20 +48,12 @@ class AuthViewModel(
 
         viewModelScope.launch {
             _loginState.value = AuthUiState.Loading
-            try {
-                val tokens = userRepository.login(em, pw)
-                tokenStore.saveTokens(tokens.accessToken, tokens.refreshToken)
-                tokenStore.saveUser(tokens.user)
-                _loginState.value = AuthUiState.Success
-            } catch (e: HttpException) {
-                // 401 is bad creds, anything else is a server hiccup
-                val msg = if (e.code() == 401) R.string.error_invalid_login
-                          else R.string.error_login_failed
-                _loginState.value = AuthUiState.Error(msg)
-            } catch (e: IOException) {
-                _loginState.value = AuthUiState.Error(R.string.error_network)
-            } catch (e: Exception) {
-                _loginState.value = AuthUiState.Error(R.string.error_login_failed)
+            val result = userRepository.login(em, pw)
+            _loginState.value = when (result) {
+                LoginResult.Success            -> AuthUiState.Success
+                LoginResult.InvalidCredentials -> AuthUiState.Error(R.string.error_invalid_login)
+                LoginResult.NetworkError       -> AuthUiState.Error(R.string.error_network)
+                LoginResult.UnknownError       -> AuthUiState.Error(R.string.error_login_failed)
             }
         }
     }
@@ -74,7 +64,7 @@ class AuthViewModel(
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val app = this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as MediaTrackerApp
-                AuthViewModel(app.tokenStore, UserRepository())
+                AuthViewModel(DefaultUserRepository(app.tokenStore))
             }
         }
     }

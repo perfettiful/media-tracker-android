@@ -6,13 +6,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import edu.metrostate.ics342.mediatracker.MediaTrackerApp
 import edu.metrostate.ics342.mediatracker.R
+import edu.metrostate.ics342.mediatracker.data.RegisterResult
 import edu.metrostate.ics342.mediatracker.data.UserRepository
+import edu.metrostate.ics342.mediatracker.data.network.DefaultUserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
-import java.io.IOException
 
 class RegisterViewModel(
     private val userRepository: UserRepository,
@@ -71,23 +72,17 @@ class RegisterViewModel(
 
         viewModelScope.launch {
             _registerState.value = AuthViewModel.AuthUiState.Loading
-            try {
-                userRepository.createAccount(
-                    displayName = name,
-                    username    = user,
-                    email       = em,
-                    password    = pw,
-                )
-                _registerState.value = AuthViewModel.AuthUiState.Success
-            } catch (e: HttpException) {
-                // 409 means the email or username is already on file
-                val msg = if (e.code() == 409) R.string.error_email_or_username_taken
-                          else R.string.error_signup_failed
-                _registerState.value = AuthViewModel.AuthUiState.Error(msg)
-            } catch (e: IOException) {
-                _registerState.value = AuthViewModel.AuthUiState.Error(R.string.error_network)
-            } catch (e: Exception) {
-                _registerState.value = AuthViewModel.AuthUiState.Error(R.string.error_signup_failed)
+            val result = userRepository.register(
+                email       = em,
+                password    = pw,
+                username    = user,
+                displayName = name,
+            )
+            _registerState.value = when (result) {
+                RegisterResult.Success      -> AuthViewModel.AuthUiState.Success
+                RegisterResult.Conflict     -> AuthViewModel.AuthUiState.Error(R.string.error_email_or_username_taken)
+                RegisterResult.NetworkError -> AuthViewModel.AuthUiState.Error(R.string.error_network)
+                RegisterResult.UnknownError -> AuthViewModel.AuthUiState.Error(R.string.error_signup_failed)
             }
         }
     }
@@ -96,7 +91,10 @@ class RegisterViewModel(
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
-            initializer { RegisterViewModel(UserRepository()) }
+            initializer {
+                val app = this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as MediaTrackerApp
+                RegisterViewModel(DefaultUserRepository(app.tokenStore))
+            }
         }
     }
 }
