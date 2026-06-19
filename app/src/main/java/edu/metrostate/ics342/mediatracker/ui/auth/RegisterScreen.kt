@@ -43,17 +43,17 @@ fun RegisterScreen(
 
     val focusManager      = LocalFocusManager.current
     val snackbarHostState = remember { SnackbarHostState() }
-    val notImplementedMsg = stringResource(R.string.signup_not_implemented)
+    val accountCreatedMsg = stringResource(R.string.signup_success)
 
-    // success here just means validation passed, network is week-05 work.
-    // show the snackbar, then reset so the user can try again.
+    // on success flash a confirmation then drop them back on login to sign in
     LaunchedEffect(state) {
         if (state is AuthViewModel.AuthUiState.Success) {
             snackbarHostState.showSnackbar(
-                message  = notImplementedMsg,
+                message  = accountCreatedMsg,
                 duration = SnackbarDuration.Short,
             )
             viewModel.resetRegisterState()
+            onNavigateToLogin()
         }
     }
 

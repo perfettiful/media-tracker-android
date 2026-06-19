@@ -15,6 +15,7 @@
     <string name="username_label">Username</string>
     <string name="confirm_password_label">Confirm Password</string>
     <string name="login_prompt">Already have an account?</string>
+    <string name="signup_success">Account created. Log in to continue.</string>
 
     <!-- Navigation -->
     <string name="nav_feed">Feed</string>
@@ -73,7 +74,6 @@
     <!-- Stubs -->
     <string name="search_not_implemented">Search is not implemented yet.</string>
     <string name="detail_not_implemented">Media Detail is not implemented yet.\n(mediaId = %1$d)</string>
-    <string name="signup_not_implemented">Sign Up not implemented yet.</string>
 
     <!-- Library Status -->
     <string name="status_want_to">Want to</string>
