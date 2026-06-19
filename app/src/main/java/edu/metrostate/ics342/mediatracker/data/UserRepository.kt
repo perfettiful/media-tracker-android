@@ -1,5 +1,6 @@
 package edu.metrostate.ics342.mediatracker.data
 
+import edu.metrostate.ics342.mediatracker.BuildConfig
 import edu.metrostate.ics342.mediatracker.data.model.CreateUserRequest
 import edu.metrostate.ics342.mediatracker.data.model.CreateUserResponse
 import edu.metrostate.ics342.mediatracker.data.model.TokenRequest
@@ -13,10 +14,13 @@ const val baseURL = "https://wjtzkgpxmxtzcczzbvrz.supabase.co/functions/v1/"
 
 class UserRepository {
 
+    // the api sends back fields we dont model (isFollowing etc), dont choke on them
+    private val json = Json { ignoreUnknownKeys = true }
+
     private val api: ApiService = Retrofit.Builder()
         .baseUrl(baseURL)
         .addConverterFactory(
-            Json.asConverterFactory(
+            json.asConverterFactory(
                 contentType = "application/json; charset=utf-8".toMediaType()
             )
         )
@@ -34,8 +38,8 @@ class UserRepository {
             password     = password,
             username     = username,
             displayName  = displayName,
-            clientId     = "",
-            clientSecret = "",
+            clientId     = BuildConfig.CLIENT_ID,
+            clientSecret = BuildConfig.CLIENT_SECRET,
         )
         return api.createUser(createUserRequest)
     }
@@ -45,8 +49,8 @@ class UserRepository {
             grantType    = "password",
             email        = email,
             password     = password,
-            clientId     = "",
-            clientSecret = "",
+            clientId     = BuildConfig.CLIENT_ID,
+            clientSecret = BuildConfig.CLIENT_SECRET,
         )
         return api.login(tokenRequest)
     }

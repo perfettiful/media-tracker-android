@@ -1,10 +1,17 @@
 import com.android.build.api.dsl.ApplicationExtension
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
+}
+
+// pull client creds out of local.properties so they never hit git
+val localProps = Properties().apply {
+    val f = rootProject.file("local.properties")
+    if (f.exists()) f.inputStream().use { load(it) }
 }
 
 extensions.configure<ApplicationExtension> {
@@ -19,6 +26,9 @@ extensions.configure<ApplicationExtension> {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "CLIENT_ID", "\"${localProps.getProperty("CLIENT_ID", "")}\"")
+        buildConfigField("String", "CLIENT_SECRET", "\"${localProps.getProperty("CLIENT_SECRET", "")}\"")
     }
 
     buildTypes {
@@ -36,6 +46,7 @@ extensions.configure<ApplicationExtension> {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
