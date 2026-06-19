@@ -26,7 +26,7 @@ import coil.compose.AsyncImage
 fun MyProfileScreen(
     onEditProfile: () -> Unit,
     onSettingsClick: () -> Unit,
-    viewModel: ProfileViewModel = viewModel()
+    viewModel: ProfileViewModel = viewModel(factory = ProfileViewModel.Factory)
 ) {
     val user    by viewModel.currentUser.collectAsStateWithLifecycle()
     val library by viewModel.libraryPreview.collectAsStateWithLifecycle()
