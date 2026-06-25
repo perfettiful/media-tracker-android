@@ -24,6 +24,12 @@
     <string name="nav_people">People</string>
     <string name="nav_profile">Profile</string>
 
+    <!-- Search -->
+    <string name="search_placeholder">Search books, movies, shows...</string>
+    <string name="search_results_count">%1$d results</string>
+    <string name="search_result_count">%1$d result</string>
+    <string name="search_no_results">No results for \"%1$s\".</string>
+
     <!-- Activity Feed -->
     <string name="feed_title">Feed</string>
 
