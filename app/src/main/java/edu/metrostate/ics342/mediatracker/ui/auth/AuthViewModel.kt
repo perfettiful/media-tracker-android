@@ -40,7 +40,8 @@ class AuthViewModel(
 
     fun onLoginClick() {
         val em = _email.value.trim()
-        val pw = _password.value
+        // trim, the soft keyboard likes to tack a trailing space on and the server 401s
+        val pw = _password.value.trim()
         if (em.isBlank() || pw.isBlank()) {
             _loginState.value = AuthUiState.Error(R.string.error_empty_credentials)
             return
