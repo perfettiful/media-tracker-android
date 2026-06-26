@@ -34,4 +34,6 @@ object RetrofitInstance {
     }
 
     val apiService: ApiService by lazy { retrofit.create(ApiService::class.java) }
+
+    val mediaApiService: MediaApiService by lazy { retrofit.create(MediaApiService::class.java) }
 }
