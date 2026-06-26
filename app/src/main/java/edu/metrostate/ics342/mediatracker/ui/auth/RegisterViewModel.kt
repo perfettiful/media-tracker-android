@@ -53,8 +53,8 @@ class RegisterViewModel(
         val name    = _displayName.value.trim()
         val user    = _username.value.trim()
         val em      = _email.value.trim()
-        val pw      = _password.value
-        val confirm = _confirmPassword.value
+        val pw      = _password.value.trim()
+        val confirm = _confirmPassword.value.trim()
 
         val validation = when {
             name.isBlank() || user.isBlank() || em.isBlank() ||

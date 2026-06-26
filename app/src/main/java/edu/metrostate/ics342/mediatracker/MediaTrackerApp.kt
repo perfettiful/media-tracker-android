@@ -2,6 +2,7 @@ package edu.metrostate.ics342.mediatracker
 
 import android.app.Application
 import edu.metrostate.ics342.mediatracker.data.TokenStore
+import edu.metrostate.ics342.mediatracker.data.network.RetrofitInstance
 
 class MediaTrackerApp : Application() {
 
@@ -12,5 +13,7 @@ class MediaTrackerApp : Application() {
     override fun onCreate() {
         super.onCreate()
         tokenStore = TokenStore(this)
+        // hand it to retrofit so the auth interceptor can pull the token
+        RetrofitInstance.tokenStore = tokenStore
     }
 }

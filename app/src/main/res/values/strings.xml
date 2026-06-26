@@ -5,6 +5,8 @@
     <!-- Auth -->
     <string name="email_label">Email</string>
     <string name="password_label">Password</string>
+    <string name="show_password">Show password</string>
+    <string name="hide_password">Hide password</string>
     <string name="sign_in_button">Log In</string>
     <string name="register_prompt">Don\'t have an account?</string>
     <string name="register_action">Sign Up</string>
@@ -23,6 +25,16 @@
     <string name="nav_library">Library</string>
     <string name="nav_people">People</string>
     <string name="nav_profile">Profile</string>
+
+    <!-- Search -->
+    <string name="search_placeholder">Search books, movies, shows...</string>
+    <string name="search_browse">Browse</string>
+    <string name="search_failed">Couldn\'t load results. Try again.</string>
+    <string name="search_scroll_more">Scroll for more</string>
+    <string name="search_results_count">%1$d results</string>
+    <string name="search_results_count_more">%1$d+ results</string>
+    <string name="search_result_count">%1$d result</string>
+    <string name="search_no_results">No results for \"%1$s\".</string>
 
     <!-- Activity Feed -->
     <string name="feed_title">Feed</string>
