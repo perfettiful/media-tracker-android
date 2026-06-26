@@ -1,5 +1,11 @@
 package edu.metrostate.ics342.mediatracker.ui.search
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -19,6 +25,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -26,7 +34,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
 import edu.metrostate.ics342.mediatracker.R
 import edu.metrostate.ics342.mediatracker.data.model.Media
 import edu.metrostate.ics342.mediatracker.data.model.creatorCredit
@@ -144,27 +152,16 @@ private fun SearchResultCard(media: Media, onClick: () -> Unit) {
                 contentAlignment = Alignment.Center
             ) {
                 if (media.coverUrl != null) {
-                    AsyncImage(
+                    SubcomposeAsyncImage(
                         model              = media.coverUrl,
                         contentDescription = media.title,
                         contentScale       = ContentScale.Crop,
-                        modifier           = Modifier.fillMaxSize()
+                        modifier           = Modifier.fillMaxSize(),
+                        loading            = { ShimmerTile() },
+                        error              = { MediaTypeTile(media.mediaType) }
                     )
                 } else {
-                    // colored tile + icon per media type, matches the wireframe
-                    val (tileColor, iconColor, icon) = when (media.mediaType) {
-                        "book"  -> Triple(MaterialTheme.colorScheme.primaryContainer, MaterialTheme.colorScheme.onPrimaryContainer, Icons.Outlined.MenuBook)
-                        "movie" -> Triple(Color(0xFFFCE7F3), Color(0xFFBE185D), Icons.Outlined.Movie)
-                        "show"  -> Triple(MaterialTheme.colorScheme.secondaryContainer, MaterialTheme.colorScheme.onSecondaryContainer, Icons.Outlined.Tv)
-                        else    -> Triple(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.colorScheme.onSurfaceVariant, Icons.Outlined.HelpOutline)
-                    }
-                    Box(
-                        modifier = Modifier.fillMaxSize().background(tileColor),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(icon, contentDescription = null, tint = iconColor,
-                            modifier = Modifier.size(28.dp))
-                    }
+                    MediaTypeTile(media.mediaType)
                 }
             }
 
@@ -191,4 +188,44 @@ private fun SearchResultCard(media: Media, onClick: () -> Unit) {
             }
         }
     }
+}
+
+// generic cover stand-in, colored tile + icon per media type. shows when
+// theres no cover url or the image fails to load
+@Composable
+private fun MediaTypeTile(mediaType: String) {
+    val (tileColor, iconColor, icon) = when (mediaType) {
+        "book"  -> Triple(MaterialTheme.colorScheme.primaryContainer, MaterialTheme.colorScheme.onPrimaryContainer, Icons.Outlined.MenuBook)
+        "movie" -> Triple(Color(0xFFFCE7F3), Color(0xFFBE185D), Icons.Outlined.Movie)
+        "show"  -> Triple(MaterialTheme.colorScheme.secondaryContainer, MaterialTheme.colorScheme.onSecondaryContainer, Icons.Outlined.Tv)
+        else    -> Triple(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.colorScheme.onSurfaceVariant, Icons.Outlined.HelpOutline)
+    }
+    Box(
+        modifier = Modifier.fillMaxSize().background(tileColor),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(icon, contentDescription = null, tint = iconColor, modifier = Modifier.size(28.dp))
+    }
+}
+
+// skeleton shimmer while a real cover loads
+@Composable
+private fun ShimmerTile() {
+    val transition = rememberInfiniteTransition(label = "shimmer")
+    val offset by transition.animateFloat(
+        initialValue = -200f,
+        targetValue  = 200f,
+        animationSpec = infiniteRepeatable(
+            animation  = tween(900, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "shimmer-offset"
+    )
+    val base = MaterialTheme.colorScheme.surfaceVariant
+    val brush = Brush.linearGradient(
+        colors = listOf(base.copy(alpha = 0.4f), base.copy(alpha = 0.9f), base.copy(alpha = 0.4f)),
+        start  = Offset(offset, 0f),
+        end    = Offset(offset + 150f, 150f)
+    )
+    Box(Modifier.fillMaxSize().background(brush))
 }
