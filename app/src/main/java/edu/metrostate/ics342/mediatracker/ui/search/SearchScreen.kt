@@ -34,7 +34,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -47,6 +46,8 @@ import coil.request.ImageRequest
 import edu.metrostate.ics342.mediatracker.R
 import edu.metrostate.ics342.mediatracker.data.model.Media
 import edu.metrostate.ics342.mediatracker.data.model.creatorCredit
+import edu.metrostate.ics342.mediatracker.theme.MovieContainer
+import edu.metrostate.ics342.mediatracker.theme.OnMovieContainer
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -259,7 +260,7 @@ private fun SearchResultCard(media: Media, onClick: () -> Unit) {
 private fun MediaTypeTile(mediaType: String) {
     val (tileColor, iconColor, icon) = when (mediaType) {
         "book"  -> Triple(MaterialTheme.colorScheme.primaryContainer, MaterialTheme.colorScheme.onPrimaryContainer, Icons.Outlined.MenuBook)
-        "movie" -> Triple(Color(0xFFFCE7F3), Color(0xFFBE185D), Icons.Outlined.Movie)
+        "movie" -> Triple(MovieContainer, OnMovieContainer, Icons.Outlined.Movie)
         "show"  -> Triple(MaterialTheme.colorScheme.secondaryContainer, MaterialTheme.colorScheme.onSecondaryContainer, Icons.Outlined.Tv)
         else    -> Triple(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.colorScheme.onSurfaceVariant, Icons.Outlined.HelpOutline)
     }
