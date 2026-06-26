@@ -30,6 +30,7 @@
     <string name="search_placeholder">Search books, movies, shows...</string>
     <string name="search_browse">Browse</string>
     <string name="search_failed">Couldn\'t load results. Try again.</string>
+    <string name="search_scroll_more">Scroll for more</string>
     <string name="search_results_count">%1$d results</string>
     <string name="search_result_count">%1$d result</string>
     <string name="search_no_results">No results for \"%1$s\".</string>

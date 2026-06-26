@@ -1,21 +1,28 @@
 package edu.metrostate.ics342.mediatracker.ui.search
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.HelpOutline
+import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.MenuBook
 import androidx.compose.material.icons.outlined.Movie
 import androidx.compose.material.icons.outlined.Search
@@ -35,9 +42,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.SubcomposeAsyncImage
+import coil.request.ImageRequest
 import edu.metrostate.ics342.mediatracker.R
 import edu.metrostate.ics342.mediatracker.data.model.Media
 import edu.metrostate.ics342.mediatracker.data.model.creatorCredit
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,6 +59,8 @@ fun SearchScreen(
     val results      by viewModel.results.collectAsState()
     val isLoading    by viewModel.isLoading.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
+
+    val listState = rememberLazyListState()
 
     Column(modifier = Modifier.fillMaxSize()) {
         TopAppBar(title = { Text(stringResource(R.string.app_name)) })
@@ -125,14 +136,58 @@ fun SearchScreen(
                     color    = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
-                LazyColumn(
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(results, key = { it.id }) { media ->
-                        SearchResultCard(media = media, onClick = { onMediaClick(media.id) })
+                SearchResultsList(
+                    results      = results,
+                    listState    = listState,
+                    onMediaClick = onMediaClick
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SearchResultsList(
+    results: List<Media>,
+    listState: LazyListState,
+    onMediaClick: (Int) -> Unit,
+) {
+    val scope = rememberCoroutineScope()
+    Box(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(
+            state = listState,
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 80.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(results, key = { it.id }) { media ->
+                SearchResultCard(media = media, onClick = { onMediaClick(media.id) })
+            }
+        }
+
+        // float a down chevron while theres more below, fade it out at the bottom
+        AnimatedVisibility(
+            visible  = listState.canScrollForward,
+            enter    = fadeIn(),
+            exit     = fadeOut(),
+            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 16.dp)
+        ) {
+            Surface(
+                shape           = CircleShape,
+                color           = MaterialTheme.colorScheme.primaryContainer,
+                shadowElevation = 4.dp,
+                onClick = {
+                    scope.launch {
+                        val target = (listState.firstVisibleItemIndex + 4).coerceAtMost(results.lastIndex)
+                        listState.animateScrollToItem(target)
                     }
                 }
+            ) {
+                Icon(
+                    Icons.Outlined.KeyboardArrowDown,
+                    contentDescription = stringResource(R.string.search_scroll_more),
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier.padding(6.dp).size(24.dp)
+                )
             }
         }
     }
@@ -153,7 +208,10 @@ private fun SearchResultCard(media: Media, onClick: () -> Unit) {
             ) {
                 if (media.coverUrl != null) {
                     SubcomposeAsyncImage(
-                        model              = media.coverUrl,
+                        model              = ImageRequest.Builder(LocalContext.current)
+                            .data(media.coverUrl)
+                            .crossfade(300)
+                            .build(),
                         contentDescription = media.title,
                         contentScale       = ContentScale.Crop,
                         modifier           = Modifier.fillMaxSize(),
