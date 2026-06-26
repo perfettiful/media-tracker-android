@@ -28,7 +28,7 @@
 
     <!-- Search -->
     <string name="search_placeholder">Search books, movies, shows...</string>
-    <string name="search_popular">Popular this week</string>
+    <string name="search_popular">Most popular</string>
     <string name="search_results_count">%1$d results</string>
     <string name="search_result_count">%1$d result</string>
     <string name="search_no_results">No results for \"%1$s\".</string>

@@ -36,10 +36,10 @@ class SearchViewModel : ViewModel() {
     private fun runSearch() {
         val q = _query.value.trim()
         // blank query falls back to the popular list for the selected chip,
-        // otherwise filter by title. either way most-rated floats to the top.
+        // otherwise filter by title. sort by rating count, star rating breaks ties.
         _results.value = fakeSearchResults
             .filter { _selectedType.value == "all" || it.mediaType == _selectedType.value }
             .filter { q.isBlank() || it.title.contains(q, ignoreCase = true) }
-            .sortedByDescending { it.ratingCount }
+            .sortedWith(compareByDescending<Media> { it.ratingCount }.thenByDescending { it.averageRating })
     }
 }
