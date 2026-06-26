@@ -40,6 +40,8 @@ fun SearchScreen(
     val query        by viewModel.query.collectAsState()
     val selectedType by viewModel.selectedType.collectAsState()
     val results      by viewModel.results.collectAsState()
+    val isLoading    by viewModel.isLoading.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsState()
 
     Column(modifier = Modifier.fillMaxSize()) {
         TopAppBar(title = { Text(stringResource(R.string.app_name)) })
@@ -75,37 +77,54 @@ fun SearchScreen(
             }
         }
 
-        if (query.isNotBlank() && results.isEmpty()) {
-            Box(
-                modifier = Modifier.fillMaxSize().padding(32.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    stringResource(R.string.search_no_results, query),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+        when {
+            isLoading && results.isEmpty() -> {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
             }
-            return@Column
-        }
 
-        Text(
-            when {
-                query.isBlank()   -> stringResource(R.string.search_popular)
-                results.size == 1 -> stringResource(R.string.search_result_count, results.size)
-                else              -> stringResource(R.string.search_results_count, results.size)
-            },
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-            style    = MaterialTheme.typography.labelMedium,
-            color    = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+            errorMessage != null && results.isEmpty() -> {
+                Box(Modifier.fillMaxSize().padding(32.dp), contentAlignment = Alignment.Center) {
+                    Text(
+                        stringResource(errorMessage!!),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    )
+                }
+            }
 
-        LazyColumn(
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(results, key = { it.id }) { media ->
-                SearchResultCard(media = media, onClick = { onMediaClick(media.id) })
+            query.isNotBlank() && results.isEmpty() -> {
+                Box(Modifier.fillMaxSize().padding(32.dp), contentAlignment = Alignment.Center) {
+                    Text(
+                        stringResource(R.string.search_no_results, query),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            else -> {
+                Text(
+                    when {
+                        query.isBlank()   -> stringResource(R.string.search_browse)
+                        results.size == 1 -> stringResource(R.string.search_result_count, results.size)
+                        else              -> stringResource(R.string.search_results_count, results.size)
+                    },
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    style    = MaterialTheme.typography.labelMedium,
+                    color    = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                LazyColumn(
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(results, key = { it.id }) { media ->
+                        SearchResultCard(media = media, onClick = { onMediaClick(media.id) })
+                    }
+                }
             }
         }
     }
