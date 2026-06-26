@@ -16,9 +16,11 @@ https://github.com/perfettiful/media-tracker-android/pull/7
 
 ## Code Review
 
-**Reviewed:** *(Jama)*
+**Reviewed:** *(Dustin)*
 
 **Link to my review:**
+
+https://github.com/dmarsh31/media-tracker-android/pull/8
 
 
 
