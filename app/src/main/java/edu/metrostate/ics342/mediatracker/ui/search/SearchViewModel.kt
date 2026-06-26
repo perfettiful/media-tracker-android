@@ -18,6 +18,11 @@ class SearchViewModel : ViewModel() {
     private val _results = MutableStateFlow<List<Media>>(emptyList())
     val results: StateFlow<List<Media>> = _results.asStateFlow()
 
+    init {
+        // show something on first load instead of a blank screen
+        runSearch()
+    }
+
     fun onQueryChange(value: String) {
         _query.value = value
         runSearch()
@@ -30,15 +35,11 @@ class SearchViewModel : ViewModel() {
 
     private fun runSearch() {
         val q = _query.value.trim()
-        // nothing typed yet, keep the screen empty (default state)
-        if (q.isBlank()) {
-            _results.value = emptyList()
-            return
-        }
-        // mock list for now, swap for GET /media once the interceptor is in
-        _results.value = fakeSearchResults.filter { media ->
-            (_selectedType.value == "all" || media.mediaType == _selectedType.value) &&
-                media.title.contains(q, ignoreCase = true)
-        }
+        // blank query falls back to the popular list for the selected chip,
+        // otherwise filter by title. either way most-rated floats to the top.
+        _results.value = fakeSearchResults
+            .filter { _selectedType.value == "all" || it.mediaType == _selectedType.value }
+            .filter { q.isBlank() || it.title.contains(q, ignoreCase = true) }
+            .sortedByDescending { it.ratingCount }
     }
 }

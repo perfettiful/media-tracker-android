@@ -83,15 +83,16 @@ fun SearchScreen(
             return@Column
         }
 
-        if (results.isNotEmpty()) {
-            Text(
-                if (results.size == 1) stringResource(R.string.search_result_count, results.size)
-                else stringResource(R.string.search_results_count, results.size),
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                style    = MaterialTheme.typography.labelMedium,
-                color    = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
+        Text(
+            when {
+                query.isBlank()   -> stringResource(R.string.search_popular)
+                results.size == 1 -> stringResource(R.string.search_result_count, results.size)
+                else              -> stringResource(R.string.search_results_count, results.size)
+            },
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            style    = MaterialTheme.typography.labelMedium,
+            color    = MaterialTheme.colorScheme.onSurfaceVariant
+        )
 
         LazyColumn(
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
