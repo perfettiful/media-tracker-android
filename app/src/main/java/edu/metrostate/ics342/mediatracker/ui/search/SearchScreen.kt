@@ -91,6 +91,7 @@ fun SearchScreen(
                 Text(
                     when {
                         query.isBlank()   -> stringResource(R.string.search_browse)
+                        hasMore           -> stringResource(R.string.search_results_count_more, results.size)
                         results.size == 1 -> stringResource(R.string.search_result_count, results.size)
                         else              -> stringResource(R.string.search_results_count, results.size)
                     },
