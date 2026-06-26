@@ -207,6 +207,9 @@ private fun SearchResultCard(media: Media, onClick: () -> Unit) {
                 contentAlignment = Alignment.Center
             ) {
                 if (media.coverUrl != null) {
+                    // shimmer sits behind so the image crossfades over it instead of
+                    // flashing the empty box for a frame between loading and loaded
+                    ShimmerTile()
                     SubcomposeAsyncImage(
                         model              = ImageRequest.Builder(LocalContext.current)
                             .data(media.coverUrl)
@@ -215,7 +218,6 @@ private fun SearchResultCard(media: Media, onClick: () -> Unit) {
                         contentDescription = media.title,
                         contentScale       = ContentScale.Crop,
                         modifier           = Modifier.fillMaxSize(),
-                        loading            = { ShimmerTile() },
                         error              = { MediaTypeTile(media.mediaType) }
                     )
                 } else {
