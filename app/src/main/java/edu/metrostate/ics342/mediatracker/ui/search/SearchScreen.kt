@@ -34,7 +34,9 @@ fun SearchScreen(
     val selectedType by viewModel.selectedType.collectAsState()
     val results      by viewModel.results.collectAsState()
     val isLoading    by viewModel.isLoading.collectAsState()
-    val errorMessage by viewModel.errorMessage.collectAsState()
+    val errorMessage  by viewModel.errorMessage.collectAsState()
+    val isLoadingMore by viewModel.isLoadingMore.collectAsState()
+    val hasMore       by viewModel.hasMore.collectAsState()
 
     val listState = rememberLazyListState()
 
@@ -98,9 +100,12 @@ fun SearchScreen(
                 )
 
                 SearchResultsList(
-                    results      = results,
-                    listState    = listState,
-                    onMediaClick = onMediaClick
+                    results       = results,
+                    listState     = listState,
+                    isLoadingMore = isLoadingMore,
+                    hasMore       = hasMore,
+                    onLoadMore    = viewModel::loadMore,
+                    onMediaClick  = onMediaClick
                 )
             }
         }
@@ -111,9 +116,24 @@ fun SearchScreen(
 private fun SearchResultsList(
     results: List<Media>,
     listState: LazyListState,
+    isLoadingMore: Boolean,
+    hasMore: Boolean,
+    onLoadMore: () -> Unit,
     onMediaClick: (Int) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
+
+    // fire a page load once the last item is within a few rows of the bottom
+    val reachedEnd by remember {
+        derivedStateOf {
+            val last = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1
+            last >= listState.layoutInfo.totalItemsCount - 4
+        }
+    }
+    LaunchedEffect(reachedEnd, hasMore) {
+        if (reachedEnd && hasMore) onLoadMore()
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
             state = listState,
@@ -122,6 +142,13 @@ private fun SearchResultsList(
         ) {
             items(results, key = { it.id }) { media ->
                 SearchResultCard(media = media, onClick = { onMediaClick(media.id) })
+            }
+            if (isLoadingMore) {
+                item {
+                    Box(Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(modifier = Modifier.size(28.dp), strokeWidth = 2.dp)
+                    }
+                }
             }
         }
 
