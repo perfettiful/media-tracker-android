@@ -109,14 +109,23 @@ fun SearchResultCard(media: Media, onClick: () -> Unit) {
                     maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Spacer(Modifier.height(6.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("★ ${media.averageRating}",
-                        style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.secondary)
-                    Text("  ·  ${media.mediaType.replaceFirstChar { it.uppercase() }}" +
-                        (media.publishedYear?.let { " · $it" } ?: ""),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    // only show a star once the item actually has ratings, otherwise
+                    // everything reads "0.0" which looks broken
+                    if (media.ratingCount > 0) {
+                        Text("★ ${"%.1f".format(media.averageRating)}",
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.secondary)
+                        Text("  ·  ${media.mediaType.replaceFirstChar { it.uppercase() }}" +
+                            (media.publishedYear?.let { " · $it" } ?: ""),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    } else {
+                        Text(media.mediaType.replaceFirstChar { it.uppercase() } +
+                            (media.publishedYear?.let { " · $it" } ?: ""),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
                 }
             }
         }
