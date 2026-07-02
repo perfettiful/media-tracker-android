@@ -14,7 +14,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
@@ -105,8 +104,7 @@ private fun ActivityCard(
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(event.descriptionText(LocalContext.current),
-                    style      = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.SemiBold)
+                    style = MaterialTheme.typography.titleSmall)
 
                 if (event.activityType == "review" && event.rating != null) {
                     Spacer(Modifier.height(4.dp))

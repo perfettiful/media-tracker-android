@@ -18,7 +18,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
@@ -198,7 +197,7 @@ private fun LibraryItemCard(
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(item.media.title, style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold, maxLines = 2)
+                    maxLines = 2)
                 Spacer(Modifier.height(2.dp))
                 Text(item.media.creatorCredit(LocalContext.current),
                     style = MaterialTheme.typography.bodySmall,

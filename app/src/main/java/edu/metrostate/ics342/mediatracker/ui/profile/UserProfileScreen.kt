@@ -14,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -82,8 +81,7 @@ fun UserProfileScreen(
             }
 
             Spacer(Modifier.height(12.dp))
-            Text(user.displayName, style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold)
+            Text(user.displayName, style = MaterialTheme.typography.titleLarge)
             Spacer(Modifier.height(2.dp))
             Text("@${user.username}", style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -99,20 +97,17 @@ fun UserProfileScreen(
 
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(user.followerCount.toString(), style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold)
+                    Text(user.followerCount.toString(), style = MaterialTheme.typography.titleLarge)
                     Text(stringResource(edu.metrostate.ics342.mediatracker.R.string.profile_followers), style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(user.followingCount.toString(), style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold)
+                    Text(user.followingCount.toString(), style = MaterialTheme.typography.titleLarge)
                     Text(stringResource(edu.metrostate.ics342.mediatracker.R.string.profile_following), style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(user.trackedCount.toString(), style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold)
+                    Text(user.trackedCount.toString(), style = MaterialTheme.typography.titleLarge)
                     Text(stringResource(edu.metrostate.ics342.mediatracker.R.string.profile_tracked), style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
@@ -162,8 +157,7 @@ fun UserProfileScreen(
                         }
                     }
                     Spacer(Modifier.width(12.dp))
-                    Text(item.media.title, style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Medium)
+                    Text(item.media.title, style = MaterialTheme.typography.titleSmall)
                 }
             }
         }

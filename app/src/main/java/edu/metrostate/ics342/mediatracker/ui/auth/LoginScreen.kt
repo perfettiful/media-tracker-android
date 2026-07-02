@@ -16,7 +16,6 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -165,9 +164,8 @@ fun LoginScreen(
             Spacer(Modifier.width(4.dp))
             Text(
                 text = stringResource(edu.metrostate.ics342.mediatracker.R.string.register_action),
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.clickable(onClick = onNavigateToRegister)
             )
         }
