@@ -55,7 +55,12 @@ fun MediaTypeFilterChips(
             FilterChip(
                 selected = selectedType == key,
                 onClick  = { onTypeSelect(key) },
-                label    = { Text(stringResource(labelRes)) }
+                label    = { Text(stringResource(labelRes)) },
+                shape    = RoundedCornerShape(8.dp),
+                colors   = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                    selectedLabelColor     = MaterialTheme.colorScheme.onPrimaryContainer,
+                )
             )
         }
     }
@@ -130,7 +135,7 @@ fun SearchResultCard(media: Media, onClick: () -> Unit) {
 // generic cover stand-in, colored tile + icon per media type. shows when
 // theres no cover url or the image fails to load
 @Composable
-private fun MediaTypeTile(mediaType: String) {
+fun MediaTypeTile(mediaType: String) {
     val (tileColor, iconColor, icon) = when (mediaType) {
         "book"  -> Triple(MaterialTheme.colorScheme.primaryContainer, MaterialTheme.colorScheme.onPrimaryContainer, Icons.Outlined.MenuBook)
         "movie" -> Triple(MaterialTheme.colorScheme.secondaryContainer, MaterialTheme.colorScheme.onSecondaryContainer, Icons.Outlined.Movie)
