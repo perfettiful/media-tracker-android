@@ -1,5 +1,6 @@
 package edu.metrostate.ics342.mediatracker.ui.profile
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -120,11 +121,14 @@ fun UserProfileScreen(
             if (isFollowing) {
                 OutlinedButton(
                     onClick  = { isFollowing = false },
+                    shape    = RoundedCornerShape(20.dp),
+                    border   = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
                     modifier = Modifier.fillMaxWidth()
                 ) { Text(stringResource(edu.metrostate.ics342.mediatracker.R.string.action_following)) }
             } else {
                 Button(
                     onClick  = { isFollowing = true },
+                    shape    = RoundedCornerShape(20.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) { Text(stringResource(edu.metrostate.ics342.mediatracker.R.string.action_follow)) }
             }

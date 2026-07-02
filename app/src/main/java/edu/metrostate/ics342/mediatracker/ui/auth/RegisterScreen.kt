@@ -122,6 +122,8 @@ fun RegisterScreen(
                 singleLine    = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                 keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
+                shape  = RoundedCornerShape(8.dp),
+                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = MaterialTheme.colorScheme.primary),
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -134,6 +136,8 @@ fun RegisterScreen(
                 singleLine    = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                 keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
+                shape  = RoundedCornerShape(8.dp),
+                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = MaterialTheme.colorScheme.primary),
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -149,6 +153,8 @@ fun RegisterScreen(
                     imeAction    = ImeAction.Next,
                 ),
                 keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
+                shape  = RoundedCornerShape(8.dp),
+                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = MaterialTheme.colorScheme.primary),
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -173,6 +179,8 @@ fun RegisterScreen(
                     imeAction    = ImeAction.Next,
                 ),
                 keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
+                shape  = RoundedCornerShape(8.dp),
+                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = MaterialTheme.colorScheme.primary),
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -200,6 +208,8 @@ fun RegisterScreen(
                     focusManager.clearFocus()
                     viewModel.onSignUpClicked()
                 }),
+                shape  = RoundedCornerShape(8.dp),
+                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = MaterialTheme.colorScheme.primary),
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -217,6 +227,7 @@ fun RegisterScreen(
             Button(
                 onClick  = { focusManager.clearFocus(); viewModel.onSignUpClicked() },
                 enabled  = !isLoading,
+                shape    = RoundedCornerShape(20.dp),
                 modifier = Modifier.fillMaxWidth().height(48.dp),
             ) {
                 if (isLoading) {

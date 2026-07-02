@@ -97,6 +97,8 @@ fun LoginScreen(
             keyboardActions = KeyboardActions(
                 onNext = { focusManager.moveFocus(FocusDirection.Down) }
             ),
+            shape  = RoundedCornerShape(8.dp),
+            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = MaterialTheme.colorScheme.primary),
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -126,6 +128,8 @@ fun LoginScreen(
             keyboardActions = KeyboardActions(
                 onDone = { focusManager.clearFocus(); viewModel.onLoginClick() }
             ),
+            shape  = RoundedCornerShape(8.dp),
+            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = MaterialTheme.colorScheme.primary),
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -140,6 +144,7 @@ fun LoginScreen(
         Button(
             onClick  = { focusManager.clearFocus(); viewModel.onLoginClick() },
             enabled  = !isLoading,
+            shape    = RoundedCornerShape(20.dp),
             modifier = Modifier.fillMaxWidth().height(48.dp)
         ) {
             if (isLoading) {
