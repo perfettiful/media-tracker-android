@@ -112,7 +112,8 @@ private fun ActivityCard(
                     Spacer(Modifier.height(4.dp))
                     Text(
                         "★".repeat(event.rating) + "☆".repeat(5 - event.rating),
-                        color = MaterialTheme.colorScheme.secondary
+                        // ratings are amber per the spec, thats tertiary now
+                        color = MaterialTheme.colorScheme.tertiary
                     )
                     if (!event.reviewText.isNullOrBlank()) {
                         Spacer(Modifier.height(2.dp))

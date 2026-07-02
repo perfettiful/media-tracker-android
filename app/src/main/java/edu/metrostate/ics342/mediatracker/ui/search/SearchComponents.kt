@@ -36,8 +36,6 @@ import coil.request.ImageRequest
 import edu.metrostate.ics342.mediatracker.R
 import edu.metrostate.ics342.mediatracker.data.model.Media
 import edu.metrostate.ics342.mediatracker.data.model.creatorCredit
-import edu.metrostate.ics342.mediatracker.theme.MovieContainer
-import edu.metrostate.ics342.mediatracker.theme.OnMovieContainer
 
 @Composable
 fun MediaTypeFilterChips(
@@ -115,7 +113,7 @@ fun SearchResultCard(media: Media, onClick: () -> Unit) {
                         Text("★ ${"%.1f".format(media.averageRating)}",
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.secondary)
+                            color = MaterialTheme.colorScheme.tertiary)
                         Text("  ·  ${media.mediaType.replaceFirstChar { it.uppercase() }}" +
                             (media.publishedYear?.let { " · $it" } ?: ""),
                             style = MaterialTheme.typography.labelMedium,
@@ -138,8 +136,8 @@ fun SearchResultCard(media: Media, onClick: () -> Unit) {
 private fun MediaTypeTile(mediaType: String) {
     val (tileColor, iconColor, icon) = when (mediaType) {
         "book"  -> Triple(MaterialTheme.colorScheme.primaryContainer, MaterialTheme.colorScheme.onPrimaryContainer, Icons.Outlined.MenuBook)
-        "movie" -> Triple(MovieContainer, OnMovieContainer, Icons.Outlined.Movie)
-        "show"  -> Triple(MaterialTheme.colorScheme.secondaryContainer, MaterialTheme.colorScheme.onSecondaryContainer, Icons.Outlined.Tv)
+        "movie" -> Triple(MaterialTheme.colorScheme.secondaryContainer, MaterialTheme.colorScheme.onSecondaryContainer, Icons.Outlined.Movie)
+        "show"  -> Triple(MaterialTheme.colorScheme.tertiaryContainer, MaterialTheme.colorScheme.onTertiaryContainer, Icons.Outlined.Tv)
         else    -> Triple(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.colorScheme.onSurfaceVariant, Icons.Outlined.HelpOutline)
     }
     Box(
