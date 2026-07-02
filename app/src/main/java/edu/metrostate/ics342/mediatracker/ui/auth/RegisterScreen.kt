@@ -21,7 +21,6 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -123,6 +122,8 @@ fun RegisterScreen(
                 singleLine    = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                 keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
+                shape  = RoundedCornerShape(8.dp),
+                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = MaterialTheme.colorScheme.primary),
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -135,6 +136,8 @@ fun RegisterScreen(
                 singleLine    = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                 keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
+                shape  = RoundedCornerShape(8.dp),
+                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = MaterialTheme.colorScheme.primary),
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -150,6 +153,8 @@ fun RegisterScreen(
                     imeAction    = ImeAction.Next,
                 ),
                 keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
+                shape  = RoundedCornerShape(8.dp),
+                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = MaterialTheme.colorScheme.primary),
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -174,6 +179,8 @@ fun RegisterScreen(
                     imeAction    = ImeAction.Next,
                 ),
                 keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
+                shape  = RoundedCornerShape(8.dp),
+                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = MaterialTheme.colorScheme.primary),
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -201,6 +208,8 @@ fun RegisterScreen(
                     focusManager.clearFocus()
                     viewModel.onSignUpClicked()
                 }),
+                shape  = RoundedCornerShape(8.dp),
+                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = MaterialTheme.colorScheme.primary),
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -218,6 +227,7 @@ fun RegisterScreen(
             Button(
                 onClick  = { focusManager.clearFocus(); viewModel.onSignUpClicked() },
                 enabled  = !isLoading,
+                shape    = RoundedCornerShape(20.dp),
                 modifier = Modifier.fillMaxWidth().height(48.dp),
             ) {
                 if (isLoading) {
@@ -242,9 +252,8 @@ fun RegisterScreen(
                 Spacer(Modifier.width(4.dp))
                 Text(
                     text       = stringResource(R.string.sign_in_button),
-                    style      = MaterialTheme.typography.bodyMedium,
+                    style      = MaterialTheme.typography.labelLarge,
                     color      = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.SemiBold,
                     modifier   = Modifier.clickable(onClick = onNavigateToLogin)
                 )
             }

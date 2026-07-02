@@ -18,13 +18,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import edu.metrostate.ics342.mediatracker.data.model.LibraryItem
 import edu.metrostate.ics342.mediatracker.data.model.LibraryStatus
 import edu.metrostate.ics342.mediatracker.data.model.creatorCredit
+import edu.metrostate.ics342.mediatracker.ui.StatusBadge
+import edu.metrostate.ics342.mediatracker.ui.search.MediaTypeFilterChips
+import edu.metrostate.ics342.mediatracker.ui.search.MediaTypeTile
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,27 +43,13 @@ fun LibraryScreen(
     Column(modifier = Modifier.fillMaxSize()) {
         TopAppBar(title = { Text(stringResource(edu.metrostate.ics342.mediatracker.R.string.library_title)) })
 
-        Row(
-            modifier = Modifier
+        MediaTypeFilterChips(
+            selectedType = selectedType,
+            onTypeSelect = { selectedType = it },
+            modifier     = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp)
-                .horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            listOf(
-                "all"   to edu.metrostate.ics342.mediatracker.R.string.filter_all,
-                "book"  to edu.metrostate.ics342.mediatracker.R.string.filter_books,
-                "movie" to edu.metrostate.ics342.mediatracker.R.string.filter_movies,
-                "show"  to edu.metrostate.ics342.mediatracker.R.string.filter_shows
-            )
-                .forEach { (key, labelRes) ->
-                    FilterChip(
-                        selected = selectedType == key,
-                        onClick  = { selectedType = key },
-                        label    = { Text(stringResource(labelRes)) }
-                    )
-                }
-        }
+        )
 
         SingleChoiceSegmentedButtonRow(
             modifier = Modifier
@@ -74,6 +62,10 @@ fun LibraryScreen(
                         index = index, count = LibraryStatus.values().size),
                     selected = selectedStatus == status,
                     onClick  = { viewModel.updateFilter(status) },
+                    colors   = SegmentedButtonDefaults.colors(
+                        activeContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                        activeContentColor   = MaterialTheme.colorScheme.onPrimaryContainer,
+                    ),
                     label    = { Text(stringResource(status.labelRes)) }
                 )
             }
@@ -165,7 +157,8 @@ private fun LibraryItemCard(
     Card(
         modifier  = Modifier.fillMaxWidth().clickable { onClick() },
         shape     = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        colors    = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(
@@ -182,15 +175,7 @@ private fun LibraryItemCard(
                         modifier          = Modifier.fillMaxSize()
                     )
                 } else {
-                    Surface(color = MaterialTheme.colorScheme.surfaceVariant,
-                        modifier = Modifier.fillMaxSize()) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Text(when (item.media.mediaType) {
-                                "book" -> "📖"; "movie" -> "🎬"; "show" -> "📺"
-                                else -> "?"
-                            }, style = MaterialTheme.typography.titleLarge)
-                        }
-                    }
+                    MediaTypeTile(item.media.mediaType)
                 }
             }
 
@@ -198,16 +183,15 @@ private fun LibraryItemCard(
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(item.media.title, style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold, maxLines = 2)
+                    maxLines = 2)
                 Spacer(Modifier.height(2.dp))
                 Text(item.media.creatorCredit(LocalContext.current),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(Modifier.height(6.dp))
-                SuggestionChip(
-                    onClick = { statusDialogVisible = true },
-                    label   = { Text(stringResource(item.status.labelRes),
-                        style = MaterialTheme.typography.labelSmall) }
+                StatusBadge(
+                    status  = item.status,
+                    onClick = { statusDialogVisible = true }
                 )
             }
 

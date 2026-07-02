@@ -1,5 +1,6 @@
 package edu.metrostate.ics342.mediatracker.ui.profile
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -14,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -85,8 +85,7 @@ fun MyProfileScreen(
             }
 
             Spacer(Modifier.height(12.dp))
-            Text(u.displayName, style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold)
+            Text(u.displayName, style = MaterialTheme.typography.titleLarge)
             Spacer(Modifier.height(2.dp))
             Text("@${u.username}", style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -113,6 +112,8 @@ fun MyProfileScreen(
 
             OutlinedButton(
                 onClick  = onEditProfile,
+                shape    = RoundedCornerShape(20.dp),
+                border   = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
                 modifier = Modifier.fillMaxWidth()
             ) { Text(stringResource(edu.metrostate.ics342.mediatracker.R.string.profile_edit_button)) }
 
@@ -153,8 +154,7 @@ fun MyProfileScreen(
                         }
                         Spacer(Modifier.width(12.dp))
                         Column {
-                            Text(item.media.title, style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Medium)
+                            Text(item.media.title, style = MaterialTheme.typography.titleSmall)
                             Text(stringResource(item.status.labelRes),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -169,7 +169,7 @@ fun MyProfileScreen(
 @Composable
 private fun StatItem(value: String, labelRes: Int) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(value, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+        Text(value, style = MaterialTheme.typography.titleLarge)
         Text(stringResource(labelRes), style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant)
     }

@@ -1,10 +1,12 @@
 package edu.metrostate.ics342.mediatracker.ui.connections
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -12,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import edu.metrostate.ics342.mediatracker.data.FakeMediaRepository
@@ -107,8 +108,7 @@ private fun UserRow(
         Spacer(Modifier.width(12.dp))
 
         Column(modifier = Modifier.weight(1f)) {
-            Text(user.displayName, style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.SemiBold)
+            Text(user.displayName, style = MaterialTheme.typography.titleSmall)
             Text("@${user.username}", style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
@@ -118,12 +118,15 @@ private fun UserRow(
         if (following) {
             OutlinedButton(
                 onClick  = { following = false },
+                shape    = RoundedCornerShape(20.dp),
+                border   = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
                 modifier = Modifier.height(32.dp),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 0.dp)
             ) { Text(stringResource(edu.metrostate.ics342.mediatracker.R.string.action_following), style = MaterialTheme.typography.labelMedium) }
         } else {
             Button(
                 onClick  = { following = true },
+                shape    = RoundedCornerShape(20.dp),
                 modifier = Modifier.height(32.dp),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 0.dp)
             ) { Text(stringResource(edu.metrostate.ics342.mediatracker.R.string.action_follow), style = MaterialTheme.typography.labelMedium) }

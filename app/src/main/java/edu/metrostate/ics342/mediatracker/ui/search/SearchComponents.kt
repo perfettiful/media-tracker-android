@@ -28,7 +28,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
@@ -36,8 +35,6 @@ import coil.request.ImageRequest
 import edu.metrostate.ics342.mediatracker.R
 import edu.metrostate.ics342.mediatracker.data.model.Media
 import edu.metrostate.ics342.mediatracker.data.model.creatorCredit
-import edu.metrostate.ics342.mediatracker.theme.MovieContainer
-import edu.metrostate.ics342.mediatracker.theme.OnMovieContainer
 
 @Composable
 fun MediaTypeFilterChips(
@@ -58,7 +55,12 @@ fun MediaTypeFilterChips(
             FilterChip(
                 selected = selectedType == key,
                 onClick  = { onTypeSelect(key) },
-                label    = { Text(stringResource(labelRes)) }
+                label    = { Text(stringResource(labelRes)) },
+                shape    = RoundedCornerShape(8.dp),
+                colors   = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                    selectedLabelColor     = MaterialTheme.colorScheme.onPrimaryContainer,
+                )
             )
         }
     }
@@ -100,7 +102,6 @@ fun SearchResultCard(media: Media, onClick: () -> Unit) {
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(media.title, style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold,
                     maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Spacer(Modifier.height(2.dp))
                 Text(media.creatorCredit(LocalContext.current),
@@ -114,8 +115,7 @@ fun SearchResultCard(media: Media, onClick: () -> Unit) {
                     if (media.ratingCount > 0) {
                         Text("★ ${"%.1f".format(media.averageRating)}",
                             style = MaterialTheme.typography.labelMedium,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.secondary)
+                            color = MaterialTheme.colorScheme.tertiary)
                         Text("  ·  ${media.mediaType.replaceFirstChar { it.uppercase() }}" +
                             (media.publishedYear?.let { " · $it" } ?: ""),
                             style = MaterialTheme.typography.labelMedium,
@@ -135,11 +135,11 @@ fun SearchResultCard(media: Media, onClick: () -> Unit) {
 // generic cover stand-in, colored tile + icon per media type. shows when
 // theres no cover url or the image fails to load
 @Composable
-private fun MediaTypeTile(mediaType: String) {
+fun MediaTypeTile(mediaType: String) {
     val (tileColor, iconColor, icon) = when (mediaType) {
         "book"  -> Triple(MaterialTheme.colorScheme.primaryContainer, MaterialTheme.colorScheme.onPrimaryContainer, Icons.Outlined.MenuBook)
-        "movie" -> Triple(MovieContainer, OnMovieContainer, Icons.Outlined.Movie)
-        "show"  -> Triple(MaterialTheme.colorScheme.secondaryContainer, MaterialTheme.colorScheme.onSecondaryContainer, Icons.Outlined.Tv)
+        "movie" -> Triple(MaterialTheme.colorScheme.secondaryContainer, MaterialTheme.colorScheme.onSecondaryContainer, Icons.Outlined.Movie)
+        "show"  -> Triple(MaterialTheme.colorScheme.tertiaryContainer, MaterialTheme.colorScheme.onTertiaryContainer, Icons.Outlined.Tv)
         else    -> Triple(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.colorScheme.onSurfaceVariant, Icons.Outlined.HelpOutline)
     }
     Box(

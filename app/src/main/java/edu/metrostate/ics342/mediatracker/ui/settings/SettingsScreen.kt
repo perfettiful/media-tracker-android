@@ -2,6 +2,7 @@ package edu.metrostate.ics342.mediatracker.ui.settings
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
@@ -96,7 +97,9 @@ fun SettingsScreen(
             ) {
                 OutlinedButton(
                     onClick  = { signOutDialogVisible = true },
+                    shape    = RoundedCornerShape(20.dp),
                     modifier = Modifier.fillMaxWidth(),
+                    // stays error-red on purpose, its the destructive action
                     colors   = ButtonDefaults.outlinedButtonColors(
                         contentColor = MaterialTheme.colorScheme.error
                     )
