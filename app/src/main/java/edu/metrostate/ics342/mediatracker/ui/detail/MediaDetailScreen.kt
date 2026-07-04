@@ -19,16 +19,20 @@ import androidx.compose.material.icons.outlined.StarHalf
 import androidx.compose.material.icons.outlined.Tv
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import edu.metrostate.ics342.mediatracker.R
-import edu.metrostate.ics342.mediatracker.data.FakeMediaRepository
 import edu.metrostate.ics342.mediatracker.data.model.MediaDetail
 import edu.metrostate.ics342.mediatracker.data.model.Review
 import edu.metrostate.ics342.mediatracker.data.model.creatorCredit
@@ -39,11 +43,14 @@ import kotlin.math.roundToInt
 fun MediaDetailScreen(
     mediaId: Int,
     onNavigateBack: () -> Unit,
-    onWriteReview: (Int) -> Unit
+    onWriteReview: (Int) -> Unit,
+    viewModel: MediaDetailViewModel = viewModel()
 ) {
-    // not wired to the api yet, shows the hardcoded sample regardless of id
-    val detail = FakeMediaRepository.sampleMediaDetail
-    val reviews = FakeMediaRepository.sampleReviews
+    val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(mediaId) {
+        viewModel.load(mediaId)
+    }
 
     Column(modifier = Modifier.fillMaxSize()) {
         TopAppBar(
@@ -66,7 +73,42 @@ fun MediaDetailScreen(
             }
         )
 
-        Column(
+        when (val state = uiState) {
+            is MediaDetailViewModel.DetailUiState.Loading -> {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            }
+
+            is MediaDetailViewModel.DetailUiState.Error -> {
+                Box(Modifier.fillMaxSize().padding(32.dp), contentAlignment = Alignment.Center) {
+                    Text(
+                        stringResource(state.msgResId),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+
+            is MediaDetailViewModel.DetailUiState.Loaded -> {
+                DetailContent(
+                    detail        = state.detail,
+                    reviews       = state.reviews,
+                    onWriteReview = onWriteReview
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun DetailContent(
+    detail: MediaDetail,
+    reviews: List<Review>,
+    onWriteReview: (Int) -> Unit
+) {
+    Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
@@ -174,7 +216,6 @@ fun MediaDetailScreen(
             }
         }
     }
-}
 
 @Composable
 private fun MediaCover(detail: MediaDetail) {

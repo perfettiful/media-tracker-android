@@ -127,6 +127,7 @@
     <string name="detail_stat_seasons">Seasons</string>
     <string name="detail_stat_genre">Genre</string>
     <string name="detail_runtime_minutes">%1$d min</string>
+    <string name="detail_failed">Couldn\'t load this title. Try again.</string>
 
     <!-- Media -->
     <string name="media_unknown_author">Unknown Author</string>
