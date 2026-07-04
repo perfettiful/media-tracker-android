@@ -1,9 +1,22 @@
 package edu.metrostate.ics342.mediatracker.data
 
 import edu.metrostate.ics342.mediatracker.data.model.Media
+import edu.metrostate.ics342.mediatracker.data.model.MediaDetail
+import edu.metrostate.ics342.mediatracker.data.model.Review
 
 interface MediaRepository {
     suspend fun searchMedia(query: String?, type: String?, after: String?): SearchPage
+    suspend fun getMediaDetail(id: Int): DetailResult
+}
+
+sealed interface DetailResult {
+    data class Success(
+        val detail: MediaDetail,
+        val reviews: List<Review>,
+    ) : DetailResult
+
+    data object NetworkError : DetailResult
+    data object UnknownError : DetailResult
 }
 
 sealed interface SearchPage {
