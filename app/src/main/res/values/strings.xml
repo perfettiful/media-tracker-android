@@ -85,7 +85,6 @@
 
     <!-- Stubs -->
     <string name="search_not_implemented">Search is not implemented yet.</string>
-    <string name="detail_not_implemented">Media Detail is not implemented yet.\n(mediaId = %1$d)</string>
 
     <!-- Library Status -->
     <string name="status_want_to">Want to</string>
@@ -113,6 +112,22 @@
     <string name="error_network">Couldn\'t reach the server. Check your connection.</string>
     <string name="error_invalid_login">Wrong email or password.</string>
     <string name="error_login_failed">Couldn\'t log you in. Try again.</string>
+
+    <!-- Media Detail -->
+    <string name="detail_add_want_to">+ Want to</string>
+    <string name="detail_save">Save</string>
+    <string name="detail_about">About</string>
+    <string name="detail_not_yet_rated">Not yet rated</string>
+    <string name="detail_reviews_count">Reviews (%1$d)</string>
+    <string name="detail_write_review">+ Write Review</string>
+    <string name="detail_no_reviews">No reviews yet. Be the first to review.</string>
+    <string name="detail_stat_year">Year</string>
+    <string name="detail_stat_pages">Pages</string>
+    <string name="detail_stat_runtime">Runtime</string>
+    <string name="detail_stat_seasons">Seasons</string>
+    <string name="detail_stat_genre">Genre</string>
+    <string name="detail_runtime_minutes">%1$d min</string>
+    <string name="detail_failed">Couldn\'t load this title. Try again.</string>
 
     <!-- Media -->
     <string name="media_unknown_author">Unknown Author</string>
