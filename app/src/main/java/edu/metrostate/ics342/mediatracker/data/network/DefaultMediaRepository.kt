@@ -3,6 +3,8 @@ package edu.metrostate.ics342.mediatracker.data.network
 import edu.metrostate.ics342.mediatracker.data.DetailResult
 import edu.metrostate.ics342.mediatracker.data.MediaRepository
 import edu.metrostate.ics342.mediatracker.data.SearchPage
+import edu.metrostate.ics342.mediatracker.data.model.AddLibraryRequest
+import edu.metrostate.ics342.mediatracker.data.model.LibraryStatus
 import java.io.IOException
 
 class DefaultMediaRepository(
@@ -51,6 +53,32 @@ class DefaultMediaRepository(
             DetailResult.NetworkError
         } catch (e: Exception) {
             DetailResult.UnknownError
+        }
+    }
+
+    override suspend fun getLibraryStatus(mediaId: Int): LibraryStatus? {
+        return try {
+            val response = service.getLibraryItem(mediaId)
+            // 404 here is the normal "not added yet" answer, not an error
+            if (response.isSuccessful) response.body()?.status else null
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    override suspend fun addToLibrary(mediaId: Int, status: LibraryStatus): LibraryStatus? {
+        return try {
+            val response = service.addToLibrary(
+                AddLibraryRequest(mediaId = mediaId, status = status.toApiString())
+            )
+            when {
+                response.isSuccessful   -> response.body()?.status ?: status
+                // 409 means its already in the library, go ask what status it has
+                response.code() == 409  -> getLibraryStatus(mediaId)
+                else                    -> null
+            }
+        } catch (e: Exception) {
+            null
         }
     }
 }
