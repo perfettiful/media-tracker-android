@@ -81,13 +81,22 @@ fun MediaDetailScreen(
             }
 
             is MediaDetailViewModel.DetailUiState.Error -> {
-                Box(Modifier.fillMaxSize().padding(32.dp), contentAlignment = Alignment.Center) {
+                Column(
+                    modifier = Modifier.fillMaxSize().padding(32.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     Text(
                         stringResource(state.msgResId),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center
                     )
+                    Spacer(Modifier.height(16.dp))
+                    Button(
+                        onClick = { viewModel.retry() },
+                        shape   = RoundedCornerShape(20.dp)
+                    ) { Text(stringResource(R.string.action_retry)) }
                 }
             }
 

@@ -27,6 +27,13 @@ class MediaDetailViewModel(
 
     private var loadedId: Int? = null
 
+    // error state retry, drop the guard so load actually refetches
+    fun retry() {
+        val id = loadedId ?: return
+        loadedId = null
+        load(id)
+    }
+
     fun load(mediaId: Int) {
         // screen recomposes plenty, only fetch when the id actually changes
         if (loadedId == mediaId) return
