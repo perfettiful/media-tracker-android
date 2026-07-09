@@ -33,9 +33,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import edu.metrostate.ics342.mediatracker.R
+import edu.metrostate.ics342.mediatracker.data.model.LibraryStatus
 import edu.metrostate.ics342.mediatracker.data.model.MediaDetail
 import edu.metrostate.ics342.mediatracker.data.model.Review
 import edu.metrostate.ics342.mediatracker.data.model.creatorCredit
+import edu.metrostate.ics342.mediatracker.ui.StatusBadge
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -104,6 +106,9 @@ fun MediaDetailScreen(
                 DetailContent(
                     detail        = state.detail,
                     reviews       = state.reviews,
+                    libraryStatus = state.libraryStatus,
+                    isAdding      = state.isAddingToLibrary,
+                    onAddWantTo   = viewModel::onAddWantTo,
                     onWriteReview = onWriteReview
                 )
             }
@@ -115,6 +120,9 @@ fun MediaDetailScreen(
 private fun DetailContent(
     detail: MediaDetail,
     reviews: List<Review>,
+    libraryStatus: LibraryStatus?,
+    isAdding: Boolean,
+    onAddWantTo: () -> Unit,
     onWriteReview: (Int) -> Unit
 ) {
     Column(
@@ -155,12 +163,27 @@ private fun DetailContent(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                Button(
-                    onClick = { /* TODO: add to library */ },
-                    shape = RoundedCornerShape(20.dp),
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(stringResource(R.string.detail_add_want_to))
+                if (libraryStatus != null) {
+                    // already in the library, show which shelf instead of the add button
+                    Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                        StatusBadge(status = libraryStatus)
+                    }
+                } else {
+                    Button(
+                        onClick = onAddWantTo,
+                        enabled = !isAdding,
+                        shape = RoundedCornerShape(20.dp),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        if (isAdding) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(18.dp),
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            Text(stringResource(R.string.detail_add_want_to))
+                        }
+                    }
                 }
                 OutlinedButton(
                     onClick = { /* TODO: save */ },
