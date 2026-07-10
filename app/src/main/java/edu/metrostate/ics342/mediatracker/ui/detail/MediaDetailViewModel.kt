@@ -60,6 +60,23 @@ class MediaDetailViewModel(
         }
     }
 
+    // silent refetch for coming back from write review, keeps showing the old
+    // content while the new copy loads and only swaps on success
+    fun refresh() {
+        val id = loadedId ?: return
+        if (_uiState.value !is DetailUiState.Loaded) return
+        viewModelScope.launch {
+            val result = mediaRepository.getMediaDetail(id)
+            if (result is DetailResult.Success) {
+                _uiState.value = DetailUiState.Loaded(
+                    detail        = result.detail,
+                    reviews       = result.reviews,
+                    libraryStatus = mediaRepository.getLibraryStatus(id),
+                )
+            }
+        }
+    }
+
     fun onAddWantTo() {
         val current = _uiState.value as? DetailUiState.Loaded ?: return
         // already in the library, or a request is mid flight, dont fire another
