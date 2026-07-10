@@ -19,6 +19,7 @@ import androidx.compose.material.icons.outlined.StarHalf
 import androidx.compose.material.icons.outlined.Tv
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -30,12 +31,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import edu.metrostate.ics342.mediatracker.R
+import edu.metrostate.ics342.mediatracker.data.model.LibraryStatus
 import edu.metrostate.ics342.mediatracker.data.model.MediaDetail
 import edu.metrostate.ics342.mediatracker.data.model.Review
 import edu.metrostate.ics342.mediatracker.data.model.creatorCredit
+import edu.metrostate.ics342.mediatracker.ui.StatusBadge
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,6 +56,17 @@ fun MediaDetailScreen(
 
     LaunchedEffect(mediaId) {
         viewModel.load(mediaId)
+    }
+
+    // refetch when we come back into view, e.g. after posting a review.
+    // refresh() no-ops until the first load is done so this doesnt double fetch
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) viewModel.refresh()
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -81,13 +98,22 @@ fun MediaDetailScreen(
             }
 
             is MediaDetailViewModel.DetailUiState.Error -> {
-                Box(Modifier.fillMaxSize().padding(32.dp), contentAlignment = Alignment.Center) {
+                Column(
+                    modifier = Modifier.fillMaxSize().padding(32.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     Text(
                         stringResource(state.msgResId),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center
                     )
+                    Spacer(Modifier.height(16.dp))
+                    Button(
+                        onClick = { viewModel.retry() },
+                        shape   = RoundedCornerShape(20.dp)
+                    ) { Text(stringResource(R.string.action_retry)) }
                 }
             }
 
@@ -95,6 +121,9 @@ fun MediaDetailScreen(
                 DetailContent(
                     detail        = state.detail,
                     reviews       = state.reviews,
+                    libraryStatus = state.libraryStatus,
+                    isAdding      = state.isAddingToLibrary,
+                    onAddWantTo   = viewModel::onAddWantTo,
                     onWriteReview = onWriteReview
                 )
             }
@@ -106,6 +135,9 @@ fun MediaDetailScreen(
 private fun DetailContent(
     detail: MediaDetail,
     reviews: List<Review>,
+    libraryStatus: LibraryStatus?,
+    isAdding: Boolean,
+    onAddWantTo: () -> Unit,
     onWriteReview: (Int) -> Unit
 ) {
     Column(
@@ -146,12 +178,27 @@ private fun DetailContent(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                Button(
-                    onClick = { /* TODO: add to library */ },
-                    shape = RoundedCornerShape(20.dp),
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(stringResource(R.string.detail_add_want_to))
+                if (libraryStatus != null) {
+                    // already in the library, show which shelf instead of the add button
+                    Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                        StatusBadge(status = libraryStatus)
+                    }
+                } else {
+                    Button(
+                        onClick = onAddWantTo,
+                        enabled = !isAdding,
+                        shape = RoundedCornerShape(20.dp),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        if (isAdding) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(18.dp),
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            Text(stringResource(R.string.detail_add_want_to))
+                        }
+                    }
                 }
                 OutlinedButton(
                     onClick = { /* TODO: save */ },

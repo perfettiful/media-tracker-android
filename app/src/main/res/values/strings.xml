@@ -83,6 +83,14 @@
     <string name="settings_change_password">Change password</string>
     <string name="settings_dark_mode">Dark mode</string>
 
+    <!-- Write Review -->
+    <string name="review_title">Write Review</string>
+    <string name="review_placeholder">Share your thoughts…</string>
+    <string name="review_share_feed">Share to activity feed</string>
+    <string name="review_post">Post Review</string>
+    <string name="review_char_count">%1$d/%2$d</string>
+    <string name="action_close">Close</string>
+
     <!-- Stubs -->
     <string name="search_not_implemented">Search is not implemented yet.</string>
 
@@ -128,6 +136,9 @@
     <string name="detail_stat_genre">Genre</string>
     <string name="detail_runtime_minutes">%1$d min</string>
     <string name="detail_failed">Couldn\'t load this title. Try again.</string>
+    <string name="action_retry">Retry</string>
+    <string name="error_already_reviewed">You already reviewed this one.</string>
+    <string name="error_review_failed">Couldn\'t post your review. Try again.</string>
 
     <!-- Media -->
     <string name="media_unknown_author">Unknown Author</string>
