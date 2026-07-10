@@ -1,6 +1,7 @@
 package edu.metrostate.ics342.mediatracker.data.network
 
 import edu.metrostate.ics342.mediatracker.data.model.AddLibraryRequest
+import edu.metrostate.ics342.mediatracker.data.model.AddReviewRequest
 import edu.metrostate.ics342.mediatracker.data.model.LibraryItem
 import edu.metrostate.ics342.mediatracker.data.model.Media
 import edu.metrostate.ics342.mediatracker.data.model.MediaDetail
@@ -35,4 +36,7 @@ interface MediaApiService {
 
     @POST("library")
     suspend fun addToLibrary(@Body request: AddLibraryRequest): Response<LibraryItem>
+
+    @POST("reviews")
+    suspend fun postReview(@Body request: AddReviewRequest): Response<Review>
 }

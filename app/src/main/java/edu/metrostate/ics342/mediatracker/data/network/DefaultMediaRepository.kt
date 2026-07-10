@@ -2,8 +2,10 @@ package edu.metrostate.ics342.mediatracker.data.network
 
 import edu.metrostate.ics342.mediatracker.data.DetailResult
 import edu.metrostate.ics342.mediatracker.data.MediaRepository
+import edu.metrostate.ics342.mediatracker.data.PostReviewResult
 import edu.metrostate.ics342.mediatracker.data.SearchPage
 import edu.metrostate.ics342.mediatracker.data.model.AddLibraryRequest
+import edu.metrostate.ics342.mediatracker.data.model.AddReviewRequest
 import edu.metrostate.ics342.mediatracker.data.model.LibraryStatus
 import java.io.IOException
 
@@ -79,6 +81,33 @@ class DefaultMediaRepository(
             }
         } catch (e: Exception) {
             null
+        }
+    }
+
+    override suspend fun postReview(
+        mediaId: Int,
+        rating: Int,
+        reviewText: String?,
+        shareToFeed: Boolean,
+    ): PostReviewResult {
+        return try {
+            val response = service.postReview(
+                AddReviewRequest(
+                    mediaId     = mediaId,
+                    rating      = rating,
+                    reviewText  = reviewText?.ifBlank { null },
+                    shareToFeed = shareToFeed,
+                )
+            )
+            when {
+                response.isSuccessful  -> PostReviewResult.Success
+                response.code() == 409 -> PostReviewResult.AlreadyReviewed
+                else                   -> PostReviewResult.UnknownError
+            }
+        } catch (e: IOException) {
+            PostReviewResult.NetworkError
+        } catch (e: Exception) {
+            PostReviewResult.UnknownError
         }
     }
 }
