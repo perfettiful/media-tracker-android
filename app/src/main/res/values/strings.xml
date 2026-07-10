@@ -129,6 +129,8 @@
     <string name="detail_runtime_minutes">%1$d min</string>
     <string name="detail_failed">Couldn\'t load this title. Try again.</string>
     <string name="action_retry">Retry</string>
+    <string name="error_already_reviewed">You already reviewed this one.</string>
+    <string name="error_review_failed">Couldn\'t post your review. Try again.</string>
 
     <!-- Media -->
     <string name="media_unknown_author">Unknown Author</string>
