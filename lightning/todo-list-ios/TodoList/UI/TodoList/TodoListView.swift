@@ -1,51 +1,30 @@
 import SwiftUI
 
-// third pass: SF Symbols via Image(systemName:) so no icon assets needed,
-// plus the native list niceties: swipe actions, a progress header,
-// and a real empty state.
+/// The main screen.
+/// Android analogue: `TodoListScreen(viewModel) { ... }` — a composable that
+/// collects state from its ViewModel and sends events back to it.
+/// `NavigationStack` ≈ NavHost, `.sheet` ≈ a dialog/bottom-sheet destination,
+/// `.toolbar` ≈ TopAppBar/BottomAppBar slots in Scaffold.
 struct TodoListView: View {
-    enum Filter: String, CaseIterable, Identifiable {
-        case all = "All"
-        case active = "Active"
-        case done = "Done"
+    /// @ObservedObject = "re-render when this object's @Published values change",
+    /// like `collectAsStateWithLifecycle()` on every flow the screen reads.
+    @ObservedObject var viewModel: TodoListViewModel
 
-        var id: String { rawValue }
-    }
-
-    @State private var items = [
-        TodoItem(title: "Compare SwiftUI to Compose"),
-        TodoItem(title: "Build the todo list UI"),
-        TodoItem(title: "Write the README", isDone: true),
-    ]
-    @State private var filter: Filter = .all
+    /// Local UI state that no one else needs, kept in the view —
+    /// like `remember { mutableStateOf(false) }` inside a composable.
     @State private var isAddingTodo = false
-
-    private var visibleItems: [TodoItem] {
-        switch filter {
-        case .all: return items
-        case .active: return items.filter { !$0.isDone }
-        case .done: return items.filter { $0.isDone }
-        }
-    }
-
-    private var activeCount: Int { items.filter { !$0.isDone }.count }
-    private var completedCount: Int { items.count - activeCount }
-    private var hasCompletedItems: Bool { items.contains { $0.isDone } }
-    private var completionFraction: Double {
-        items.isEmpty ? 0 : Double(completedCount) / Double(items.count)
-    }
 
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
                 filterPicker
 
-                if !items.isEmpty {
+                if !viewModel.items.isEmpty {
                     progressHeader
                 }
 
-                if visibleItems.isEmpty {
-                    EmptyStateView(filter: filter)
+                if viewModel.visibleItems.isEmpty {
+                    EmptyStateView(filter: viewModel.filter)
                 } else {
                     todoList
                 }
@@ -59,32 +38,36 @@ struct TodoListView: View {
                         Label("Add Todo", systemImage: "plus")
                     }
                 }
+
             }
             .safeAreaInset(edge: .bottom) {
                 bottomStatusBar
             }
             .sheet(isPresented: $isAddingTodo) {
+                // State hoisting: the sheet owns its text field, and hands the
+                // result up through a callback — events up, state down.
                 AddTodoView { title in
-                    items.insert(TodoItem(title: title), at: 0)
+                    viewModel.add(title: title)
                 }
             }
         }
     }
 
-    // pure SwiftUI bottom bar instead of a .bottomBar toolbar: on iOS 26
-    // the toolbar version bridges to a legacy UIKit toolbar and spams
-    // "Adding 'UIKitToolbar' as a subview..." warnings in the console
+    /// Bottom bar built in pure SwiftUI rather than a `.bottomBar` toolbar:
+    /// on iOS 26 the toolbar version is bridged to a legacy UIKit toolbar and
+    /// logs "Adding 'UIKitToolbar' as a subview..." warnings in the console.
+    /// `safeAreaInset` ≈ Scaffold's `bottomBar` slot in Compose.
     private var bottomStatusBar: some View {
         HStack {
-            Text("\(activeCount) remaining")
+            Text("\(viewModel.activeCount) remaining")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
             Spacer()
             Button("Clear Completed", role: .destructive) {
-                items.removeAll { $0.isDone }
+                viewModel.clearCompleted()
             }
             .font(.footnote)
-            .disabled(!hasCompletedItems)
+            .disabled(!viewModel.hasCompletedItems)
         }
         .padding(.horizontal, Theme.screenPadding)
         .padding(.vertical, 12)
@@ -92,8 +75,8 @@ struct TodoListView: View {
     }
 
     private var filterPicker: some View {
-        Picker("Filter", selection: $filter) {
-            ForEach(Filter.allCases) { filter in
+        Picker("Filter", selection: $viewModel.filter) {
+            ForEach(TodoListViewModel.Filter.allCases) { filter in
                 Text(filter.rawValue).tag(filter)
             }
         }
@@ -104,27 +87,28 @@ struct TodoListView: View {
 
     private var progressHeader: some View {
         HStack(spacing: Theme.rowSpacing) {
-            ProgressView(value: completionFraction)
+            ProgressView(value: viewModel.completionFraction)
                 .tint(.accentColor)
-            Text("\(completedCount) of \(items.count) done")
+            Text("\(viewModel.completedCount) of \(viewModel.items.count) done")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .fixedSize()
         }
         .padding(.horizontal, Theme.screenPadding)
         .padding(.bottom, Theme.rowSpacing)
-        .animation(.snappy, value: completionFraction)
+        .animation(.snappy, value: viewModel.completionFraction)
     }
 
+    /// `List` + `ForEach` ≈ `LazyColumn` + `items(items, key = { it.id })`.
     private var todoList: some View {
         List {
-            ForEach(visibleItems) { item in
+            ForEach(viewModel.visibleItems) { item in
                 TodoRowView(item: item) {
-                    toggle(item)
+                    viewModel.toggle(item)
                 }
                 .swipeActions(edge: .leading, allowsFullSwipe: true) {
                     Button {
-                        toggle(item)
+                        viewModel.toggle(item)
                     } label: {
                         Label(item.isDone ? "Undo" : "Done",
                               systemImage: item.isDone ? "arrow.uturn.backward" : "checkmark")
@@ -133,29 +117,18 @@ struct TodoListView: View {
                 }
             }
             .onDelete { offsets in
-                delete(atVisibleOffsets: offsets)
+                viewModel.delete(atVisibleOffsets: offsets)
             }
         }
         .listStyle(.insetGrouped)
-        .animation(.default, value: visibleItems)
-    }
-
-    private func toggle(_ item: TodoItem) {
-        guard let index = items.firstIndex(where: { $0.id == item.id }) else { return }
-        items[index].isDone.toggle()
-    }
-
-    // offsets come from the filtered list the user sees, so map them
-    // back to ids before removing from the real array
-    private func delete(atVisibleOffsets offsets: IndexSet) {
-        let ids = offsets.map { visibleItems[$0].id }
-        items.removeAll { ids.contains($0.id) }
+        .animation(.default, value: viewModel.visibleItems)
     }
 }
 
-// shown when the current filter has nothing to display
+/// Shown when the current filter has nothing to display.
+/// Android analogue: a small private composable in the same file.
 private struct EmptyStateView: View {
-    let filter: TodoListView.Filter
+    let filter: TodoListViewModel.Filter
 
     var body: some View {
         ContentUnavailableView(
@@ -192,6 +165,18 @@ private struct EmptyStateView: View {
     }
 }
 
-#Preview {
-    TodoListView()
+/// Xcode previews ≈ @Preview composables. The in-memory repository plays the
+/// role of the fake repository you'd pass to a preview on Android.
+#Preview("With items") {
+    TodoListView(viewModel: TodoListViewModel(
+        repository: InMemoryTodoRepository(items: [
+            TodoItem(title: "Compare SwiftUI to Compose"),
+            TodoItem(title: "Write week 8 reflection", isDone: true),
+            TodoItem(title: "Push to GitHub"),
+        ])
+    ))
+}
+
+#Preview("Empty") {
+    TodoListView(viewModel: TodoListViewModel(repository: InMemoryTodoRepository()))
 }
