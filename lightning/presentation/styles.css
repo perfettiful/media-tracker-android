@@ -11,6 +11,24 @@
   --orange: #ff9f0a;
 }
 
+/* standard slides: heading top left, body flows underneath */
+.reveal .slides section {
+  text-align: left;
+  padding-top: 1em;
+}
+
+/* the title and closing slides stay full centered.
+   scoped to .present so reveal can still hide the others */
+.reveal .slides section.centered.present {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  height: 100%;
+  padding-top: 0;
+}
+
 .reveal .kicker {
   color: var(--mint);
   text-transform: uppercase;
