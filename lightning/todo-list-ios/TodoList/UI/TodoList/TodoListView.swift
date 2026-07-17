@@ -59,9 +59,13 @@ struct TodoListView: View {
     /// `safeAreaInset` ≈ Scaffold's `bottomBar` slot in Compose.
     private var bottomStatusBar: some View {
         HStack {
-            Text("\(viewModel.activeCount) remaining")
+            // Text concatenation lets one line mix styles, like buildAnnotatedString
+            (Text("\(viewModel.activeCount)")
+                .fontWeight(.semibold)
+                .foregroundStyle(viewModel.activeCount == 0 ? Theme.doneHighlight : Theme.activeHighlight)
+            + Text(" remaining")
+                .foregroundStyle(.secondary))
                 .font(.footnote)
-                .foregroundStyle(.secondary)
             Spacer()
             Button("Clear Completed", role: .destructive) {
                 viewModel.clearCompleted()
@@ -88,10 +92,13 @@ struct TodoListView: View {
     private var progressHeader: some View {
         HStack(spacing: Theme.rowSpacing) {
             ProgressView(value: viewModel.completionFraction)
-                .tint(.accentColor)
-            Text("\(viewModel.completedCount) of \(viewModel.items.count) done")
+                .tint(Theme.doneHighlight)
+            (Text("\(viewModel.completedCount)")
+                .fontWeight(.semibold)
+                .foregroundStyle(Theme.doneHighlight)
+            + Text(" of \(viewModel.items.count) done")
+                .foregroundStyle(.secondary))
                 .font(.caption)
-                .foregroundStyle(.secondary)
                 .fixedSize()
         }
         .padding(.horizontal, Theme.screenPadding)
@@ -113,7 +120,7 @@ struct TodoListView: View {
                         Label(item.isDone ? "Undo" : "Done",
                               systemImage: item.isDone ? "arrow.uturn.backward" : "checkmark")
                     }
-                    .tint(item.isDone ? .orange : .green)
+                    .tint(item.isDone ? Theme.activeHighlight : Theme.doneHighlight)
                 }
             }
             .onDelete { offsets in

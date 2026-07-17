@@ -12,7 +12,7 @@ struct TodoRowView: View {
             Button(action: onToggle) {
                 Image(systemName: item.isDone ? "checkmark.circle.fill" : "circle")
                     .font(.title2)
-                    .foregroundStyle(item.isDone ? Color.accentColor : .secondary)
+                    .foregroundStyle(item.isDone ? Theme.doneHighlight : .secondary)
                     .contentTransition(.symbolEffect(.replace))
             }
             .buttonStyle(.plain)
@@ -20,7 +20,7 @@ struct TodoRowView: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(item.title)
-                    .strikethrough(item.isDone)
+                    .strikethrough(item.isDone, color: Theme.doneHighlight.opacity(0.8))
                     .foregroundStyle(item.isDone ? .secondary : .primary)
 
                 Text(item.createdAt, format: .relative(presentation: .named))

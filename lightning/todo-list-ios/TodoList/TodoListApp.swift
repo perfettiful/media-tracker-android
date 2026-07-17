@@ -15,6 +15,9 @@ struct TodoListApp: App {
     var body: some Scene {
         WindowGroup {
             TodoListView(viewModel: viewModel)
+                // dark-only app: the SwiftUI version of always passing
+                // darkColorScheme() to MaterialTheme instead of isSystemInDarkTheme()
+                .preferredColorScheme(.dark)
         }
     }
 }

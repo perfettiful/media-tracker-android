@@ -10,4 +10,9 @@ enum Theme {
     static let screenPadding: CGFloat = 16
     static let rowSpacing: CGFloat = 12
     static let cornerRadius: CGFloat = 12
+
+    /// Semantic highlight colors, the hand-rolled version of a Material
+    /// color scheme's named slots (primary / tertiary / error).
+    static let doneHighlight = Color.mint
+    static let activeHighlight = Color.orange
 }
