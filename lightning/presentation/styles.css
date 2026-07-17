@@ -1,0 +1,73 @@
+/* small overrides on reveal's black theme to match the app:
+   near-black bg, mint + orange highlights */
+
+:root {
+  --r-background-color: #0d0d0f;
+  --r-main-color: #e8e8ea;
+  --r-heading-color: #ffffff;
+  --r-link-color: #33d6a6;
+  --r-link-color-hover: #66e2bd;
+  --mint: #33d6a6;
+  --orange: #ff9f0a;
+}
+
+.reveal .kicker {
+  color: var(--mint);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.45em;
+  font-weight: 600;
+  margin-bottom: 0.8em;
+}
+
+.reveal h1 {
+  font-size: 3.2em;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-transform: none;
+}
+
+.reveal h2 {
+  font-size: 1.35em;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  text-transform: none;
+}
+
+.reveal h2 code {
+  font-size: 0.9em;
+  color: var(--orange);
+}
+
+.reveal .subtitle {
+  color: #8e8e93;
+  font-size: 0.7em;
+}
+
+/* bullets, when they get written. 6 words per line, 6 lines max */
+.reveal ul {
+  list-style: none;
+  margin-left: 0;
+}
+
+.reveal ul li::before {
+  content: "-";
+  color: var(--orange);
+  margin-right: 0.5em;
+}
+
+.reveal .progress {
+  color: var(--mint);
+}
+
+/* default position collides with the nav arrows, park it bottom-left */
+.reveal .slide-number {
+  right: auto;
+  left: 16px;
+  bottom: 14px;
+  background: none;
+  color: #8e8e93;
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
