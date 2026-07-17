@@ -1,16 +1,13 @@
 import Foundation
 
-/// Abstraction over where todos live.
-/// Android analogue: the repository interface in `data/` (see MediaRepository.kt
-/// in media-tracker-android). Swift `protocol` ≈ Kotlin `interface`.
+// swift protocol = kotlin interface, same repository idea as the android app
 protocol TodoRepository {
     func load() -> [TodoItem]
     func save(_ items: [TodoItem])
 }
 
-/// Persists todos as JSON in UserDefaults.
-/// Android analogue: DataStore/SharedPreferences-backed repository. For anything
-/// bigger you'd reach for SwiftData or Core Data, the way Android reaches for Room.
+// json in UserDefaults, close enough to DataStore at this size.
+// a bigger app would use SwiftData the way android reaches for Room
 struct UserDefaultsTodoRepository: TodoRepository {
     private let key = "todo.items"
     private let defaults: UserDefaults
@@ -33,8 +30,7 @@ struct UserDefaultsTodoRepository: TodoRepository {
     }
 }
 
-/// Non-persisting implementation for previews and tests.
-/// Android analogue: FakeMediaRepository.kt in media-tracker-android.
+// fake repo for previews, same trick as FakeMediaRepository
 final class InMemoryTodoRepository: TodoRepository {
     private var items: [TodoItem]
 

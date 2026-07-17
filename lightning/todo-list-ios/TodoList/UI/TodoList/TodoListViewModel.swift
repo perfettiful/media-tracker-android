@@ -1,12 +1,9 @@
 import Foundation
 
-/// Screen-level state holder for the todo list.
-/// Android analogue: a Jetpack `ViewModel`.
-/// - `ObservableObject` + `@Published` ≈ exposing `StateFlow`s that the UI collects
-/// - `@MainActor` ≈ confining state mutation to the main dispatcher
-/// - constructor injection of the repository ≈ Hilt @Inject constructor
-/// (iOS 17's newer `@Observable` macro is closer to Compose snapshot state;
-/// ObservableObject is used here because it maps most directly onto StateFlow.)
+// the ViewModel. ObservableObject + @Published is the StateFlow setup,
+// @MainActor keeps mutations on the main thread like viewModelScope.
+// (ios 17 has a newer @Observable macro, closer to Compose snapshot state,
+// but this maps onto ViewModel + StateFlow more directly)
 @MainActor
 final class TodoListViewModel: ObservableObject {
 
@@ -18,8 +15,8 @@ final class TodoListViewModel: ObservableObject {
         var id: String { rawValue }
     }
 
-    /// UI state. `private(set)` keeps writes inside the view model —
-    /// the same reason Android exposes StateFlow but keeps MutableStateFlow private.
+    // private(set) for the same reason the android app keeps
+    // MutableStateFlow private and only exposes StateFlow
     @Published private(set) var items: [TodoItem] = []
     @Published var filter: Filter = .all
 
@@ -29,8 +26,6 @@ final class TodoListViewModel: ObservableObject {
         self.repository = repository
         items = repository.load()
     }
-
-    // MARK: - Derived state (like a `combine`d/`map`ped StateFlow)
 
     var visibleItems: [TodoItem] {
         switch filter {
@@ -48,7 +43,6 @@ final class TodoListViewModel: ObservableObject {
         items.count - activeCount
     }
 
-    /// 0…1 fraction of items completed, drives the header progress bar.
     var completionFraction: Double {
         items.isEmpty ? 0 : Double(completedCount) / Double(items.count)
     }
@@ -57,7 +51,10 @@ final class TodoListViewModel: ObservableObject {
         items.contains { $0.isDone }
     }
 
-    // MARK: - Events (UI calls down, state flows back up — unidirectional data flow)
+    // the detail route carries an id, not the whole object
+    func item(withId id: UUID) -> TodoItem? {
+        items.first { $0.id == id }
+    }
 
     func add(title: String) {
         let trimmed = title.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -72,8 +69,20 @@ final class TodoListViewModel: ObservableObject {
         persist()
     }
 
-    /// Offsets come from the *filtered* list the user sees, so map them
-    /// back to ids before removing from the source of truth.
+    func rename(_ item: TodoItem, to title: String) {
+        let trimmed = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty,
+              let index = items.firstIndex(where: { $0.id == item.id }) else { return }
+        items[index].title = trimmed
+        persist()
+    }
+
+    func delete(_ item: TodoItem) {
+        items.removeAll { $0.id == item.id }
+        persist()
+    }
+
+    // offsets are into the filtered list the user sees, map to ids first
     func delete(atVisibleOffsets offsets: IndexSet) {
         let ids = offsets.map { visibleItems[$0].id }
         items.removeAll { ids.contains($0.id) }

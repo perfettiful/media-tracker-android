@@ -1,17 +1,13 @@
 import SwiftUI
 
-/// The main screen.
-/// Android analogue: `TodoListScreen(viewModel) { ... }` — a composable that
-/// collects state from its ViewModel and sends events back to it.
-/// `NavigationStack` ≈ NavHost, `.sheet` ≈ a dialog/bottom-sheet destination,
-/// `.toolbar` ≈ TopAppBar/BottomAppBar slots in Scaffold.
+// main screen. reads state from the view model and sends events back,
+// same shape as TodoListScreen(viewModel) on the android side.
+// NavigationStack = NavHost, .sheet = dialog destination, .toolbar = app bar slots
 struct TodoListView: View {
-    /// @ObservedObject = "re-render when this object's @Published values change",
-    /// like `collectAsStateWithLifecycle()` on every flow the screen reads.
+    // re-renders when @Published values change, like collectAsState()
     @ObservedObject var viewModel: TodoListViewModel
 
-    /// Local UI state that no one else needs, kept in the view —
-    /// like `remember { mutableStateOf(false) }` inside a composable.
+    // local ui state nobody else needs, remember { mutableStateOf(false) }
     @State private var isAddingTodo = false
 
     var body: some View {
@@ -43,9 +39,12 @@ struct TodoListView: View {
             .safeAreaInset(edge: .bottom) {
                 bottomStatusBar
             }
+            // the composable("todo/{todoId}") destination
+            .navigationDestination(for: UUID.self) { itemId in
+                TodoDetailView(itemId: itemId, viewModel: viewModel)
+            }
             .sheet(isPresented: $isAddingTodo) {
-                // State hoisting: the sheet owns its text field, and hands the
-                // result up through a callback — events up, state down.
+                // sheet owns its draft, result comes back up through the callback
                 AddTodoView { title in
                     viewModel.add(title: title)
                 }
@@ -53,13 +52,12 @@ struct TodoListView: View {
         }
     }
 
-    /// Bottom bar built in pure SwiftUI rather than a `.bottomBar` toolbar:
-    /// on iOS 26 the toolbar version is bridged to a legacy UIKit toolbar and
-    /// logs "Adding 'UIKitToolbar' as a subview..." warnings in the console.
-    /// `safeAreaInset` ≈ Scaffold's `bottomBar` slot in Compose.
+    // not a .bottomBar toolbar on purpose: ios 26 bridges that to a legacy
+    // UIKit toolbar and spams console warnings. safeAreaInset is the
+    // Scaffold bottomBar slot anyway
     private var bottomStatusBar: some View {
         HStack {
-            // Text concatenation lets one line mix styles, like buildAnnotatedString
+            // concatenated Text is buildAnnotatedString, gets the count its own color
             (Text("\(viewModel.activeCount)")
                 .fontWeight(.semibold)
                 .foregroundStyle(viewModel.activeCount == 0 ? Theme.doneHighlight : Theme.activeHighlight)
@@ -106,12 +104,15 @@ struct TodoListView: View {
         .animation(.snappy, value: viewModel.completionFraction)
     }
 
-    /// `List` + `ForEach` ≈ `LazyColumn` + `items(items, key = { it.id })`.
+    // List + ForEach is LazyColumn + items(key = { it.id })
     private var todoList: some View {
         List {
             ForEach(viewModel.visibleItems) { item in
-                TodoRowView(item: item) {
-                    viewModel.toggle(item)
+                // typed route, navController.navigate("todo/${item.id}")
+                NavigationLink(value: item.id) {
+                    TodoRowView(item: item) {
+                        viewModel.toggle(item)
+                    }
                 }
                 .swipeActions(edge: .leading, allowsFullSwipe: true) {
                     Button {
@@ -132,8 +133,7 @@ struct TodoListView: View {
     }
 }
 
-/// Shown when the current filter has nothing to display.
-/// Android analogue: a small private composable in the same file.
+// shown when the current filter has nothing to display
 private struct EmptyStateView: View {
     let filter: TodoListViewModel.Filter
 
@@ -172,8 +172,7 @@ private struct EmptyStateView: View {
     }
 }
 
-/// Xcode previews ≈ @Preview composables. The in-memory repository plays the
-/// role of the fake repository you'd pass to a preview on Android.
+// previews with the fake repo, like @Preview composables
 #Preview("With items") {
     TodoListView(viewModel: TodoListViewModel(
         repository: InMemoryTodoRepository(items: [

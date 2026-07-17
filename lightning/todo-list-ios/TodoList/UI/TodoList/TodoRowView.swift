@@ -1,8 +1,6 @@
 import SwiftUI
 
-/// One row in the list.
-/// Android analogue: a stateless `TodoRow(item, onToggle)` composable —
-/// it receives data and reports events, but owns no state of its own.
+// one row. stateless like TodoRow(item, onToggle), data in and events out
 struct TodoRowView: View {
     let item: TodoItem
     let onToggle: () -> Void

@@ -1,10 +1,7 @@
 import Foundation
 
-/// Plain value type for a single todo.
-/// Android analogue: a Kotlin `data class TodoItem(...)`.
-/// - `Identifiable` gives lists a stable key (like `key = { it.id }` in LazyColumn)
-/// - `Codable` is the built-in serialization (like @Serializable / Moshi)
-/// - `Equatable` comes free on data classes in Kotlin; here we declare it
+// like a Kotlin data class. Identifiable gives List a stable key,
+// Codable handles the json (think @Serializable)
 struct TodoItem: Identifiable, Codable, Equatable {
     let id: UUID
     var title: String
