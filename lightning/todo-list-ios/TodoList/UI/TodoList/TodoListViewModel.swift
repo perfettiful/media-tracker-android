@@ -94,6 +94,17 @@ final class TodoListViewModel: ObservableObject {
         persist()
     }
 
+    // reorder happens in the filtered list, so move within the visible
+    // subset, then stitch it back into the full array. hidden items stay put
+    func move(fromVisibleOffsets source: IndexSet, toVisibleOffset destination: Int) {
+        var visible = visibleItems
+        visible.move(fromOffsets: source, toOffset: destination)
+        var reordered = visible.makeIterator()
+        let visibleIds = Set(visible.map(\.id))
+        items = items.map { visibleIds.contains($0.id) ? reordered.next()! : $0 }
+        persist()
+    }
+
     private func persist() {
         repository.save(items)
     }

@@ -16,70 +16,211 @@
       <section class="centered">
         <p class="kicker">ICS 342 - Week 13 - Lightning Exploration</p>
         <h1>iOS</h1>
-        <p class="subtitle">native Swift + SwiftUI</p>
+        <p class="subtitle">Native Swift + SwiftUI</p>
+        <img class="title-icon" src="img/icon.png" alt="TodoList app icon">
+        <br>
+        <small>Presented by</small>
+        <br>
+        <small>Nathan Perfetti & Dustin Marsh</small>
         <aside class="notes">
-          <!-- what you say out loud goes here, press S for speaker view -->
+          Our pod explored native iOS. Same todo app idea as the Android
+          side, built with Swift and SwiftUI in Xcode.
         </aside>
       </section>
 
       <section>
-        <p class="kicker">Part 1 - Demo - 3-4 min</p>
-        <h2>Todo List, running</h2>
-        <!-- live demo happens here, keep the slide nearly empty -->
-        <aside class="notes"></aside>
+        <p class="kicker">Part 1 - Demo</p>
+        <h4>Todo List, running</h4>
+        <div class="split">
+          <div class="col">
+            <ul>
+              <li>add, toggle, swipe, filter</li>
+              <li>drag reorder in edit mode</li>
+              <li>detail screen, rename, delete</li>
+              <li>persists across relaunch</li>
+            </ul>
+          </div>
+          <img class="meme" src="img/meme-develop.png" alt="glootie: do you wanna develop an app?">
+        </div>
+        <aside class="notes">
+          Live demo in the simulator, this screenshot is the backup plan.
+          Order: add two todos, toggle one, swipe right to complete, swipe
+          left to delete, flip through the filters, edit mode drag to
+          reorder, tap into the detail screen and rename, then kill the
+          app in the switcher and relaunch to show persistence.
+        </aside>
       </section>
 
       <section>
-        <p class="kicker">Part 2 - Standard Questions - 4-5 min</p>
-        <h2>Surprisingly easy?</h2>
-        <!-- fragments not sentences. 6 words per line, 6 lines max -->
-        <aside class="notes"></aside>
+        <p class="kicker">Part 2 - Standard Questions</p>
+        <h4>Surprisingly easy?</h4>
+        <div class="split">
+          <div class="col">
+            <ul>
+              <li>Whole app is ~300 lines. Compose knowledge transferred, just renamed.</li>
+              <li>Dark mode, animations, and gestures were free.</li>
+              <li>Xcode previews render with fake data, the FakeMediaRepository trick.</li>
+            </ul>
+          </div>
+          <img class="phone" src="img/app-dark.png" alt="dark mode came free">
+        </div>
+        <aside class="notes">
+          The UI was the easy part. Everything from Compose transferred
+          with new names: composables became View structs, StateFlow became
+          @Published, LazyColumn became List. Dark mode, dynamic type,
+          swipe gestures and list animations came from the platform for
+          free. Previews run against an in-memory fake repository, the
+          exact FakeMediaRepository trick from our Android app.
+        </aside>
       </section>
 
       <section>
-        <p class="kicker">Part 2 - Standard Questions - 4-5 min</p>
-        <h2>Surprisingly hard?</h2>
-        <!-- fragments not sentences. 6 words per line, 6 lines max -->
-        <aside class="notes"></aside>
+        <p class="kicker">Part 2 - Standard Questions</p>
+        <h4>Surprisingly hard?</h4>
+        <div class="split">
+          <div class="col">
+            <ul>
+              <li>The hard parts were tooling, never Swift.</li>
+              <li>Xcode defaults to a run target that needs a paid signing team. The simulator needs nothing.</li>
+              <li>The project file (project.pbxproj) is machine generated. A merge conflict there is misery.</li>
+            </ul>
+          </div>
+          <div class="col">
+            <pre class="snippet"><code>D1000000000000000000000E /* Debug */ = {
+  isa = XCBuildConfiguration;
+  buildSettings = {
+    SDKROOT = iphoneos;
+    ...
+
+// 321 lines of this. generated. good luck</code></pre>
+          </div>
+        </div>
+        <aside class="notes">
+          The hard parts were never Swift. Xcode defaulted the run target
+          to "My Mac (Designed for iPhone)" which fails wanting a signing
+          team, while the simulator needs no signing at all. Closed
+          simulator windows resurrect themselves on top of the one you
+          care about. And the project file is a generated blob that nobody
+          wants to merge. Gradle build files are nicer to live with.
+        </aside>
       </section>
 
       <section>
-        <p class="kicker">Part 2 - Standard Questions - 4-5 min</p>
-        <h2>Would we actually build with this?</h2>
-        <!-- fragments not sentences. 6 words per line, 6 lines max -->
-        <aside class="notes"></aside>
+        <p class="kicker">Part 2 - Standard Questions</p>
+        <h4>Would we actually build with this?</h4>
+        <div class="split">
+          <div class="col">
+            <ul>
+              <li>For an iPhone-first product, yes. The pain is all in week one.</li>
+              <li>Nothing we wrote runs on Android. The frameworks look alike but share zero code.</li>
+              <li>Two platforms means two codebases. A budget question, not a preference.</li>
+            </ul>
+          </div>
+          <div class="col">
+            <pre class="snippet"><code>// SwiftUI
+List(todos) { TodoRow(item: $0) }
+
+// Compose
+LazyColumn { items(todos) { TodoRow(it) } }
+
+// same idea. zero shared lines</code></pre>
+          </div>
+        </div>
+        <aside class="notes">
+          Yes, for an iPhone-first product. The tooling pain is one-time,
+          and past it SwiftUI is as productive as Compose with better
+          system integration. But nothing we wrote ships to Android. The
+          two frameworks rhyme, which makes a rewrite cheap, but it is
+          still a rewrite. A real two-platform product means a
+          cross-platform layer or two codebases and two budgets.
+        </aside>
       </section>
 
       <section>
         <p class="kicker">Part 3 - Platform Q&amp;A - 1 of 4</p>
-        <h2>How closely did <code>@State</code>/<code>@Binding</code> map onto Compose's state-hoisting model? Where did the mental model diverge?</h2>
-        <!-- fragments not sentences. 6 words per line, 6 lines max -->
-        <aside class="notes"></aside>
+        <h4>How closely did <code>@State</code>/<code>@Binding</code> map onto Compose's state-hoisting model? Where did the mental model diverge?</h4>
+        <ul>
+          <li><code>@State</code> is basically <code>remember { mutableStateOf(...) }</code>: a variable that updates the UI when it changes.</li>
+          <li><code>@Binding</code> binds to someone else's <code>@State</code>. Think of it as a pointer to the original.</li>
+          <li>The divergence: Compose children get callbacks like <code>onValueChange</code>. Swift children just get a <code>@Binding</code>.</li>
+        </ul>
+        <aside class="notes">
+          The state hoisting models are similar. The difference is how
+          children receive state. In Swift a child takes a simple @Binding
+          and writes through it. In Compose you pass the value down plus a
+          callback like onValueChange to push changes back up.
+        </aside>
       </section>
 
       <section>
         <p class="kicker">Part 3 - Platform Q&amp;A - 2 of 4</p>
-        <h2>SwiftUI only targets Apple platforms. What did you gain or give up by being tied to one vendor's tooling?</h2>
-        <!-- fragments not sentences. 6 words per line, 6 lines max -->
-        <aside class="notes"></aside>
+        <h4>SwiftUI only targets Apple platforms. What did you gain or give up by being tied to one vendor's tooling?</h4>
+        <div class="split">
+          <div class="col">
+            <table>
+              <thead>
+                <tr><th>Pros</th><th>Cons</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Smooth developer experience</td><td>Locked to Apple</td></tr>
+                <tr><td>Ecosystem is seamless</td><td>Must develop on a Mac</td></tr>
+                <tr><td>Looks great with minimal effort</td><td>Cost</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <img class="meme" src="img/meme-appstore.jpg" alt="one does not simply publish to the app store">
+        </div>
+        <aside class="notes">
+          Once installed, Xcode just works. Previews are up the second you
+          launch, and you can preview on iphones, ipads, and macs. Buttons
+          and text fields look like an Apple app with zero effort. The
+          tradeoffs: only Apple customers, you need a Mac to develop, and
+          publishing costs about 99 dollars a year while Google Play is a
+          one time 25.
+        </aside>
       </section>
 
       <section>
         <p class="kicker">Part 3 - Platform Q&amp;A - 3 of 4</p>
-        <h2>How did the Xcode Previews iteration loop compare to Compose Previews?</h2>
-        <!-- fragments not sentences. 6 words per line, 6 lines max -->
-        <aside class="notes"></aside>
+        <h4>How did the Xcode Previews iteration loop compare to Compose Previews?</h4>
+        <table>
+          <thead>
+            <tr><th>Xcode Previews</th><th>Android Studio Previews</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Work out of the box</td><td>@Preview allows more customization</td></tr>
+            <tr><td>Can interact with buttons and other UI</td><td>Multiple @Preview functions per file</td></tr>
+            <tr><td>Runs smoother</td><td>@Preview is easy to use</td></tr>
+          </tbody>
+        </table>
+        <aside class="notes">
+          Xcode previews are better out of the box: live, interactive, and
+          smooth the moment the project opens. Compose previews win on
+          customization, multiple named previews per file with different
+          devices and themes, which matters for industry scale work.
+        </aside>
       </section>
 
       <section>
         <p class="kicker">Part 3 - Platform Q&amp;A - 4 of 4</p>
-        <h2>If you had to ship the same app on Android and iOS, what would you actually share vs. rebuild from scratch?</h2>
-        <!-- fragments not sentences. 6 words per line, 6 lines max -->
-        <aside class="notes"></aside>
+        <h4>If you had to ship the same app on Android and iOS, what would you actually share vs. rebuild from scratch?</h4>
+        <ul>
+          <li>Share most of the backend: Kotlin for the API, validation, and other logic.</li>
+          <li>Rebuild the UI per platform in SwiftUI and Compose so it looks right on both.</li>
+          <li>Separate UIs let each app use unique platform features.</li>
+        </ul>
+        <aside class="notes">
+          The backend logic does not need to change, and it is better if it
+          does not. Devices have unique features, the iphone dynamic island,
+          folding phones, different OS conventions. Building the UI
+          separately lets each app take advantage of those while the
+          product behaves the same everywhere.
+        </aside>
       </section>
 
       <section class="centered">
         <h1>Questions?</h1>
+        <img class="meme" src="img/meme-questions.gif" alt="cat raising paw: i have a question">
         <aside class="notes"></aside>
       </section>
 

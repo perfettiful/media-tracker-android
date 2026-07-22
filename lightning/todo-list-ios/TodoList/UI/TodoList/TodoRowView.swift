@@ -3,18 +3,22 @@ import SwiftUI
 // one row. stateless like TodoRow(item, onToggle), data in and events out
 struct TodoRowView: View {
     let item: TodoItem
+    var isEditing = false
     let onToggle: () -> Void
 
     var body: some View {
         HStack(spacing: Theme.rowSpacing) {
-            Button(action: onToggle) {
-                Image(systemName: item.isDone ? "checkmark.circle.fill" : "circle")
-                    .font(.title2)
-                    .foregroundStyle(item.isDone ? Theme.doneHighlight : .secondary)
-                    .contentTransition(.symbolEffect(.replace))
+            // edit mode gets the red minus in this slot, so the toggle steps aside
+            if !isEditing {
+                Button(action: onToggle) {
+                    Image(systemName: item.isDone ? "checkmark.circle.fill" : "circle")
+                        .font(.title2)
+                        .foregroundStyle(item.isDone ? Theme.doneHighlight : .secondary)
+                        .contentTransition(.symbolEffect(.replace))
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(item.isDone ? "Mark as not done" : "Mark as done")
             }
-            .buttonStyle(.plain)
-            .accessibilityLabel(item.isDone ? "Mark as not done" : "Mark as done")
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(item.title)

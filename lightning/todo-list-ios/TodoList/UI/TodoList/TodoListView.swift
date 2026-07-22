@@ -9,6 +9,9 @@ struct TodoListView: View {
 
     // local ui state nobody else needs, remember { mutableStateOf(false) }
     @State private var isAddingTodo = false
+    @State private var editMode: EditMode = .inactive
+
+    private var isEditing: Bool { editMode.isEditing }
 
     var body: some View {
         NavigationStack {
@@ -27,6 +30,14 @@ struct TodoListView: View {
             }
             .navigationTitle("Todos")
             .toolbar {
+                // edit mode brings drag handles for reorder and minus buttons
+                // for delete, all free from the platform
+                ToolbarItem(placement: .topBarLeading) {
+                    Button(isEditing ? "Done" : "Edit") {
+                        withAnimation { editMode = isEditing ? .inactive : .active }
+                    }
+                    .fontWeight(isEditing ? .semibold : .regular)
+                }
                 ToolbarItem(placement: .primaryAction) {
                     Button {
                         isAddingTodo = true
@@ -108,10 +119,19 @@ struct TodoListView: View {
     private var todoList: some View {
         List {
             ForEach(viewModel.visibleItems) { item in
-                // typed route, navController.navigate("todo/${item.id}")
-                NavigationLink(value: item.id) {
-                    TodoRowView(item: item) {
-                        viewModel.toggle(item)
+                Group {
+                    if isEditing {
+                        // no chevron while editing, the drag handle owns that edge
+                        TodoRowView(item: item, isEditing: true) {
+                            viewModel.toggle(item)
+                        }
+                    } else {
+                        // typed route, navController.navigate("todo/${item.id}")
+                        NavigationLink(value: item.id) {
+                            TodoRowView(item: item) {
+                                viewModel.toggle(item)
+                            }
+                        }
                     }
                 }
                 .swipeActions(edge: .leading, allowsFullSwipe: true) {
@@ -127,9 +147,13 @@ struct TodoListView: View {
             .onDelete { offsets in
                 viewModel.delete(atVisibleOffsets: offsets)
             }
+            .onMove { source, destination in
+                viewModel.move(fromVisibleOffsets: source, toVisibleOffset: destination)
+            }
         }
         .listStyle(.insetGrouped)
         .animation(.default, value: viewModel.visibleItems)
+        .environment(\.editMode, $editMode)
     }
 }
 
