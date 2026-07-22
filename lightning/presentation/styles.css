@@ -118,8 +118,10 @@
   margin-top: 0;
 }
 
+/* px not vh: reveal scales the whole deck with a transform, so
+   viewport units double-scale on big monitors and overflow the slide */
 .reveal .split img.phone {
-  max-height: 62vh;
+  max-height: 400px;
   width: auto;
   border-radius: 18px;
   border: 1px solid #2a2a2e;
@@ -147,7 +149,7 @@
 }
 
 .reveal img.meme {
-  max-height: 48vh;
+  max-height: 330px;
   max-width: 42%;
   border-radius: 10px;
   flex: 0 0 auto;

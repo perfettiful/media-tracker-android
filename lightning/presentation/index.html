@@ -92,7 +92,7 @@
     SDKROOT = iphoneos;
     ...
 
-// 321 lines of this. generated. good luck</code></pre>
+// 321 lines of this, generated</code></pre>
           </div>
         </div>
         <aside class="notes">
@@ -121,7 +121,9 @@
 List(todos) { TodoRow(item: $0) }
 
 // Compose
-LazyColumn { items(todos) { TodoRow(it) } }
+LazyColumn {
+  items(todos) { TodoRow(it) }
+}
 
 // same idea. zero shared lines</code></pre>
           </div>
@@ -235,6 +237,7 @@ LazyColumn { items(todos) { TodoRow(it) } }
       slideNumber: "c/t",
       transition: "slide",
       center: false,
+      maxScale: 1.6,
       plugins: [RevealNotes],
     });
   </script>
