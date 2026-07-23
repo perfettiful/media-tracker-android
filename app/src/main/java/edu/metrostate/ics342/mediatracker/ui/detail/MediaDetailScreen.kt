@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
@@ -42,7 +43,12 @@ import edu.metrostate.ics342.mediatracker.data.model.LibraryStatus
 import edu.metrostate.ics342.mediatracker.data.model.MediaDetail
 import edu.metrostate.ics342.mediatracker.data.model.Review
 import edu.metrostate.ics342.mediatracker.data.model.creatorCredit
-import edu.metrostate.ics342.mediatracker.ui.StatusBadge
+import edu.metrostate.ics342.mediatracker.theme.Finished
+import edu.metrostate.ics342.mediatracker.theme.FinishedContainer
+import edu.metrostate.ics342.mediatracker.theme.InProgress
+import edu.metrostate.ics342.mediatracker.theme.InProgressContainer
+import edu.metrostate.ics342.mediatracker.theme.WantTo
+import edu.metrostate.ics342.mediatracker.theme.WantToContainer
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -186,9 +192,25 @@ private fun DetailContent(
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 if (libraryStatus != null) {
-                    // already in the library, show which shelf instead of the add button
-                    Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                        StatusBadge(status = libraryStatus)
+                    // already in the library, same pill shape but status colors and a check
+                    val (container, content) = when (libraryStatus) {
+                        LibraryStatus.WANT_TO     -> WantToContainer to WantTo
+                        LibraryStatus.IN_PROGRESS -> InProgressContainer to InProgress
+                        LibraryStatus.FINISHED    -> FinishedContainer to Finished
+                    }
+                    Button(
+                        onClick = {},
+                        enabled = false,
+                        shape = RoundedCornerShape(20.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            disabledContainerColor = container,
+                            disabledContentColor   = content,
+                        ),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Icon(Icons.Filled.Check, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(6.dp))
+                        Text(stringResource(libraryStatus.labelRes))
                     }
                 } else {
                     Button(
