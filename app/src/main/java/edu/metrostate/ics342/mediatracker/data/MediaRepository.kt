@@ -1,5 +1,6 @@
 package edu.metrostate.ics342.mediatracker.data
 
+import edu.metrostate.ics342.mediatracker.data.model.LibraryItem
 import edu.metrostate.ics342.mediatracker.data.model.LibraryStatus
 import edu.metrostate.ics342.mediatracker.data.model.Media
 import edu.metrostate.ics342.mediatracker.data.model.MediaDetail
@@ -15,12 +16,26 @@ interface MediaRepository {
     // returns the resulting status, null if the add failed
     suspend fun addToLibrary(mediaId: Int, status: LibraryStatus): LibraryStatus?
 
+    // favorites are a flag, not a shelf. 404 reads as false
+    suspend fun isFavorited(mediaId: Int): Boolean
+
+    // true once its saved, including the already-saved 409 case
+    suspend fun addFavorite(mediaId: Int): Boolean
+
+    suspend fun getLibrary(status: LibraryStatus?): LibraryResult
+
     suspend fun postReview(
         mediaId: Int,
         rating: Int,
         reviewText: String?,
         shareToFeed: Boolean,
     ): PostReviewResult
+}
+
+sealed interface LibraryResult {
+    data class Success(val items: List<LibraryItem>) : LibraryResult
+    data object NetworkError : LibraryResult
+    data object UnknownError : LibraryResult
 }
 
 sealed interface PostReviewResult {

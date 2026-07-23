@@ -1,9 +1,11 @@
 package edu.metrostate.ics342.mediatracker.data.network
 
 import edu.metrostate.ics342.mediatracker.data.DetailResult
+import edu.metrostate.ics342.mediatracker.data.LibraryResult
 import edu.metrostate.ics342.mediatracker.data.MediaRepository
 import edu.metrostate.ics342.mediatracker.data.PostReviewResult
 import edu.metrostate.ics342.mediatracker.data.SearchPage
+import edu.metrostate.ics342.mediatracker.data.model.AddFavoriteRequest
 import edu.metrostate.ics342.mediatracker.data.model.AddLibraryRequest
 import edu.metrostate.ics342.mediatracker.data.model.AddReviewRequest
 import edu.metrostate.ics342.mediatracker.data.model.LibraryStatus
@@ -81,6 +83,41 @@ class DefaultMediaRepository(
             }
         } catch (e: Exception) {
             null
+        }
+    }
+
+    override suspend fun isFavorited(mediaId: Int): Boolean {
+        return try {
+            // 404 just means not favorited, same deal as the library check
+            service.getFavorite(mediaId).isSuccessful
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    override suspend fun addFavorite(mediaId: Int): Boolean {
+        return try {
+            val response = service.addFavorite(AddFavoriteRequest(mediaId))
+            // 409 means already saved, which is the state we wanted anyway
+            response.isSuccessful || response.code() == 409
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    override suspend fun getLibrary(status: LibraryStatus?): LibraryResult {
+        return try {
+            val response = service.getLibrary(status?.toApiString())
+            val items = response.body()
+            if (response.isSuccessful && items != null) {
+                LibraryResult.Success(items)
+            } else {
+                LibraryResult.UnknownError
+            }
+        } catch (e: IOException) {
+            LibraryResult.NetworkError
+        } catch (e: Exception) {
+            LibraryResult.UnknownError
         }
     }
 

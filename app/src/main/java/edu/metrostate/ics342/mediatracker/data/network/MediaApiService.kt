@@ -1,7 +1,9 @@
 package edu.metrostate.ics342.mediatracker.data.network
 
+import edu.metrostate.ics342.mediatracker.data.model.AddFavoriteRequest
 import edu.metrostate.ics342.mediatracker.data.model.AddLibraryRequest
 import edu.metrostate.ics342.mediatracker.data.model.AddReviewRequest
+import edu.metrostate.ics342.mediatracker.data.model.Favorite
 import edu.metrostate.ics342.mediatracker.data.model.LibraryItem
 import edu.metrostate.ics342.mediatracker.data.model.Media
 import edu.metrostate.ics342.mediatracker.data.model.MediaDetail
@@ -34,9 +36,19 @@ interface MediaApiService {
     @GET("library/{mediaId}")
     suspend fun getLibraryItem(@Path("mediaId") mediaId: Int): Response<LibraryItem>
 
+    @GET("library")
+    suspend fun getLibrary(@Query("status") status: String? = null): Response<List<LibraryItem>>
+
     @POST("library")
     suspend fun addToLibrary(@Body request: AddLibraryRequest): Response<LibraryItem>
 
     @POST("reviews")
     suspend fun postReview(@Body request: AddReviewRequest): Response<Review>
+
+    // same 404-means-no trick as the library check
+    @GET("favorites/{mediaId}")
+    suspend fun getFavorite(@Path("mediaId") mediaId: Int): Response<Favorite>
+
+    @POST("favorites")
+    suspend fun addFavorite(@Body request: AddFavoriteRequest): Response<Favorite>
 }
