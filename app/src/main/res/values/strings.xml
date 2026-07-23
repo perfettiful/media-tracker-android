@@ -124,6 +124,7 @@
     <!-- Media Detail -->
     <string name="detail_add_want_to">+ Want to</string>
     <string name="detail_save">Save</string>
+    <string name="detail_saved">Saved</string>
     <string name="detail_about">About</string>
     <string name="detail_not_yet_rated">Not yet rated</string>
     <string name="detail_reviews_count">Reviews (%1$d)</string>

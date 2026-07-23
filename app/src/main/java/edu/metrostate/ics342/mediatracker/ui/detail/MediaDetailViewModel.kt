@@ -26,6 +26,9 @@ class MediaDetailViewModel(
             // null means not in the library yet
             val libraryStatus: LibraryStatus? = null,
             val isAddingToLibrary: Boolean = false,
+            // favorites are separate from library on purpose
+            val isFavorited: Boolean = false,
+            val isSaving: Boolean = false,
         ) : DetailUiState()
         data class Error(val msgResId: Int) : DetailUiState()
     }
@@ -53,6 +56,7 @@ class MediaDetailViewModel(
                     detail        = result.detail,
                     reviews       = result.reviews,
                     libraryStatus = mediaRepository.getLibraryStatus(mediaId),
+                    isFavorited   = mediaRepository.isFavorited(mediaId),
                 )
                 DetailResult.NetworkError -> DetailUiState.Error(R.string.error_network)
                 DetailResult.UnknownError -> DetailUiState.Error(R.string.detail_failed)
@@ -72,7 +76,25 @@ class MediaDetailViewModel(
                     detail        = result.detail,
                     reviews       = result.reviews,
                     libraryStatus = mediaRepository.getLibraryStatus(id),
+                    isFavorited   = mediaRepository.isFavorited(id),
                 )
+            }
+        }
+    }
+
+    fun onSave() {
+        val current = _uiState.value as? DetailUiState.Loaded ?: return
+        // already saved, or a save is mid flight, nothing to do
+        if (current.isFavorited || current.isSaving) return
+
+        _uiState.update { (it as DetailUiState.Loaded).copy(isSaving = true) }
+        viewModelScope.launch {
+            val saved = mediaRepository.addFavorite(current.detail.id)
+            _uiState.update { state ->
+                (state as? DetailUiState.Loaded)?.copy(
+                    isFavorited = saved,
+                    isSaving    = false,
+                ) ?: state
             }
         }
     }

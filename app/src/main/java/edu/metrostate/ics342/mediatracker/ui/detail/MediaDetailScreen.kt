@@ -10,6 +10,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.MenuBook
 import androidx.compose.material.icons.outlined.MoreVert
@@ -123,7 +124,10 @@ fun MediaDetailScreen(
                     reviews       = state.reviews,
                     libraryStatus = state.libraryStatus,
                     isAdding      = state.isAddingToLibrary,
+                    isFavorited   = state.isFavorited,
+                    isSaving      = state.isSaving,
                     onAddWantTo   = viewModel::onAddWantTo,
+                    onSave        = viewModel::onSave,
                     onWriteReview = onWriteReview
                 )
             }
@@ -137,7 +141,10 @@ private fun DetailContent(
     reviews: List<Review>,
     libraryStatus: LibraryStatus?,
     isAdding: Boolean,
+    isFavorited: Boolean,
+    isSaving: Boolean,
     onAddWantTo: () -> Unit,
+    onSave: () -> Unit,
     onWriteReview: (Int) -> Unit
 ) {
     Column(
@@ -201,18 +208,37 @@ private fun DetailContent(
                     }
                 }
                 OutlinedButton(
-                    onClick = { /* TODO: save */ },
+                    onClick = onSave,
+                    enabled = !isSaving,
                     shape = RoundedCornerShape(20.dp),
                     border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
                     modifier = Modifier.weight(1f)
                 ) {
-                    Icon(
-                        Icons.Outlined.FavoriteBorder,
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(Modifier.width(6.dp))
-                    Text(stringResource(R.string.detail_save))
+                    when {
+                        isSaving -> {
+                            CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
+                        }
+                        isFavorited -> {
+                            // filled heart once its saved, per the icon spec
+                            Icon(
+                                Icons.Filled.Favorite,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.secondary,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(Modifier.width(6.dp))
+                            Text(stringResource(R.string.detail_saved))
+                        }
+                        else -> {
+                            Icon(
+                                Icons.Outlined.FavoriteBorder,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(Modifier.width(6.dp))
+                            Text(stringResource(R.string.detail_save))
+                        }
+                    }
                 }
             }
 
