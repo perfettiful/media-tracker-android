@@ -19,6 +19,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import edu.metrostate.ics342.mediatracker.data.model.LibraryItem
@@ -36,9 +39,20 @@ fun LibraryScreen(
 ) {
     val items          by viewModel.libraryItems.collectAsState()
     val isLoading      by viewModel.isLoading.collectAsState()
+    val errorMessage   by viewModel.errorMessage.collectAsState()
     val selectedStatus by viewModel.filterState.collectAsState()
 
     var selectedType by rememberSaveable { mutableStateOf("all") }
+
+    // refetch when the tab comes back into view so adds from detail show up
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) viewModel.refresh()
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
 
     Column(modifier = Modifier.fillMaxSize()) {
         TopAppBar(title = { Text(stringResource(edu.metrostate.ics342.mediatracker.R.string.library_title)) })
@@ -80,8 +94,29 @@ fun LibraryScreen(
             return@Column
         }
 
+        if (errorMessage != null) {
+            Column(
+                modifier = Modifier.fillMaxSize().padding(32.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    stringResource(errorMessage!!),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
+                Spacer(Modifier.height(16.dp))
+                Button(
+                    onClick = { viewModel.loadLibrary() },
+                    shape   = RoundedCornerShape(20.dp)
+                ) { Text(stringResource(edu.metrostate.ics342.mediatracker.R.string.action_retry)) }
+            }
+            return@Column
+        }
+
+        // status comes filtered from the server now, type stays client side
         val filteredItems = items
-            .filter { it.status == selectedStatus }
             .filter { selectedType == "all" || it.media.mediaType == selectedType }
 
         if (filteredItems.isEmpty()) {
