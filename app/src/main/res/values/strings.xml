@@ -46,6 +46,7 @@
     <string name="filter_movies">Movies</string>
     <string name="filter_shows">Shows</string>
     <string name="library_empty">Nothing here yet.\nSearch for something to add.</string>
+    <string name="library_empty_filtered">Nothing in \'%1$s\' yet.\nSearch for something to add.</string>
     <string name="library_failed">Couldn\'t load your library. Try again.</string>
     <string name="library_remove_failed">Couldn\'t remove that. Try again.</string>
     <string name="library_status_failed">Couldn\'t change the status. Try again.</string>

@@ -148,7 +148,11 @@ fun LibraryScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    stringResource(edu.metrostate.ics342.mediatracker.R.string.library_empty),
+                    // name the tab so an empty Finished doesnt read like an empty library
+                    stringResource(
+                        edu.metrostate.ics342.mediatracker.R.string.library_empty_filtered,
+                        stringResource(selectedStatus.labelRes)
+                    ),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center
