@@ -9,6 +9,7 @@ import edu.metrostate.ics342.mediatracker.data.model.AddFavoriteRequest
 import edu.metrostate.ics342.mediatracker.data.model.AddLibraryRequest
 import edu.metrostate.ics342.mediatracker.data.model.AddReviewRequest
 import edu.metrostate.ics342.mediatracker.data.model.LibraryStatus
+import edu.metrostate.ics342.mediatracker.data.model.UpdateLibraryRequest
 import java.io.IOException
 
 class DefaultMediaRepository(
@@ -100,6 +101,33 @@ class DefaultMediaRepository(
             val response = service.addFavorite(AddFavoriteRequest(mediaId))
             // 409 means already saved, which is the state we wanted anyway
             response.isSuccessful || response.code() == 409
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    override suspend fun removeFavorite(mediaId: Int): Boolean {
+        return try {
+            val response = service.removeFavorite(mediaId)
+            // 404 means it was never saved, end state is the same
+            response.isSuccessful || response.code() == 404
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    override suspend fun updateLibraryStatus(mediaId: Int, status: LibraryStatus): Boolean {
+        return try {
+            service.updateLibraryItem(mediaId, UpdateLibraryRequest(status.toApiString())).isSuccessful
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    override suspend fun removeFromLibrary(mediaId: Int): Boolean {
+        return try {
+            val response = service.removeFromLibrary(mediaId)
+            response.isSuccessful || response.code() == 404
         } catch (e: Exception) {
             false
         }

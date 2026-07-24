@@ -8,10 +8,13 @@ import edu.metrostate.ics342.mediatracker.data.model.LibraryItem
 import edu.metrostate.ics342.mediatracker.data.model.Media
 import edu.metrostate.ics342.mediatracker.data.model.MediaDetail
 import edu.metrostate.ics342.mediatracker.data.model.Review
+import edu.metrostate.ics342.mediatracker.data.model.UpdateLibraryRequest
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -42,6 +45,15 @@ interface MediaApiService {
     @POST("library")
     suspend fun addToLibrary(@Body request: AddLibraryRequest): Response<LibraryItem>
 
+    @PUT("library/{mediaId}")
+    suspend fun updateLibraryItem(
+        @Path("mediaId") mediaId: Int,
+        @Body request: UpdateLibraryRequest,
+    ): Response<LibraryItem>
+
+    @DELETE("library/{mediaId}")
+    suspend fun removeFromLibrary(@Path("mediaId") mediaId: Int): Response<Unit>
+
     @POST("reviews")
     suspend fun postReview(@Body request: AddReviewRequest): Response<Review>
 
@@ -51,4 +63,7 @@ interface MediaApiService {
 
     @POST("favorites")
     suspend fun addFavorite(@Body request: AddFavoriteRequest): Response<Favorite>
+
+    @DELETE("favorites/{mediaId}")
+    suspend fun removeFavorite(@Path("mediaId") mediaId: Int): Response<Unit>
 }

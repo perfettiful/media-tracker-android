@@ -22,7 +22,14 @@ interface MediaRepository {
     // true once its saved, including the already-saved 409 case
     suspend fun addFavorite(mediaId: Int): Boolean
 
+    // true when the server confirms, a 404 counts since its already gone
+    suspend fun removeFavorite(mediaId: Int): Boolean
+
     suspend fun getLibrary(status: LibraryStatus?): LibraryResult
+
+    suspend fun updateLibraryStatus(mediaId: Int, status: LibraryStatus): Boolean
+
+    suspend fun removeFromLibrary(mediaId: Int): Boolean
 
     suspend fun postReview(
         mediaId: Int,
