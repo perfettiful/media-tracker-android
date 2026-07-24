@@ -16,7 +16,7 @@ https://github.com/perfettiful/media-tracker-android/pull/12
 
 ## Code Review
 
-**Reviewed:** *(Dustin)*
+**Reviewed:** Dustin
 
 **Link to my review:**
 
@@ -24,15 +24,15 @@ https://github.com/dmarsh31/media-tracker-android/pull/13
 
 ### What I Looked At
 
-
+Dustin's week-10 PR (#13), the same assignment I just did, so I mostly compared approaches. Focused on `LibraryViewModel` and `DefaultMediaRepository` since that's where the new library and favorites wiring lives, plus the detail screen's favorite toggle.
 
 ### What I Noticed
 
-
+His repo layer handles the status code contract really well, getLibraryItem and getFavorite do isSuccessful -> body, 404 -> null, else throw, which is the cleanest version of the "404 isn't always an error" thing I've seen in the pod. Three gaps, all in LibraryViewModel: the catch in loadLibrary skips resetting isLoading so a failed load spins forever (same bug class as his detail screen last week, finally fixes it), removeItem only filters the local list and never fires the DELETE so removed items come back on the next load, and loadLibrary takes a status param that nothing passes, so the segmented control isn't actually driving the server filter yet.
 
 ### Comments I Left
 
-
+Four. Props on the 404 handling, the forever-spinner catch with the finally suggestion, the removeItem never calling the API (he already wired the DELETE for detail so it's a tiny fix), and the unused status param keeping the filter client-side.
 
 ---
 
