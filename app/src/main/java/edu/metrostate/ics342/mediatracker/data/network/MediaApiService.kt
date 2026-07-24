@@ -61,6 +61,9 @@ interface MediaApiService {
     @GET("favorites/{mediaId}")
     suspend fun getFavorite(@Path("mediaId") mediaId: Int): Response<Favorite>
 
+    @GET("favorites")
+    suspend fun getFavorites(): Response<List<Favorite>>
+
     @POST("favorites")
     suspend fun addFavorite(@Body request: AddFavoriteRequest): Response<Favorite>
 

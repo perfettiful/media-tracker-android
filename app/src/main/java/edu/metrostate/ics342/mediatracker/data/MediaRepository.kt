@@ -1,5 +1,6 @@
 package edu.metrostate.ics342.mediatracker.data
 
+import edu.metrostate.ics342.mediatracker.data.model.Favorite
 import edu.metrostate.ics342.mediatracker.data.model.LibraryItem
 import edu.metrostate.ics342.mediatracker.data.model.LibraryStatus
 import edu.metrostate.ics342.mediatracker.data.model.Media
@@ -24,6 +25,9 @@ interface MediaRepository {
 
     // true when the server confirms, a 404 counts since its already gone
     suspend fun removeFavorite(mediaId: Int): Boolean
+
+    // null means the fetch failed, the profile just hides the section
+    suspend fun getFavorites(): List<Favorite>?
 
     suspend fun getLibrary(status: LibraryStatus?): LibraryResult
 

@@ -8,6 +8,7 @@ import edu.metrostate.ics342.mediatracker.data.SearchPage
 import edu.metrostate.ics342.mediatracker.data.model.AddFavoriteRequest
 import edu.metrostate.ics342.mediatracker.data.model.AddLibraryRequest
 import edu.metrostate.ics342.mediatracker.data.model.AddReviewRequest
+import edu.metrostate.ics342.mediatracker.data.model.Favorite
 import edu.metrostate.ics342.mediatracker.data.model.LibraryStatus
 import edu.metrostate.ics342.mediatracker.data.model.UpdateLibraryRequest
 import java.io.IOException
@@ -113,6 +114,15 @@ class DefaultMediaRepository(
             response.isSuccessful || response.code() == 404
         } catch (e: Exception) {
             false
+        }
+    }
+
+    override suspend fun getFavorites(): List<Favorite>? {
+        return try {
+            val response = service.getFavorites()
+            if (response.isSuccessful) response.body() else null
+        } catch (e: Exception) {
+            null
         }
     }
 

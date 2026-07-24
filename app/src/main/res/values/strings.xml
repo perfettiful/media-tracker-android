@@ -66,6 +66,8 @@
     <string name="profile_following">Following</string>
     <string name="profile_tracked">Tracked</string>
     <string name="profile_edit_button">Edit Profile</string>
+    <string name="profile_favorites">Favorites</string>
+    <string name="profile_no_favorites">Nothing saved yet. Tap the heart on any title.</string>
     <string name="profile_recently_tracked">Recently tracked</string>
     <string name="profile_nothing_tracked">Nothing tracked yet.</string>
     <string name="profile_user_not_found">User not found.</string>

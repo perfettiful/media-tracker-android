@@ -7,9 +7,12 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import edu.metrostate.ics342.mediatracker.MediaTrackerApp
 import edu.metrostate.ics342.mediatracker.data.FakeMediaRepository
+import edu.metrostate.ics342.mediatracker.data.MediaRepository
 import edu.metrostate.ics342.mediatracker.data.TokenStore
+import edu.metrostate.ics342.mediatracker.data.model.Favorite
 import edu.metrostate.ics342.mediatracker.data.model.LibraryItem
 import edu.metrostate.ics342.mediatracker.data.model.UserProfile
+import edu.metrostate.ics342.mediatracker.data.network.DefaultMediaRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,6 +21,7 @@ import kotlinx.coroutines.launch
 
 class ProfileViewModel(
     private val tokenStore: TokenStore,
+    private val mediaRepository: MediaRepository = DefaultMediaRepository(),
 ) : ViewModel() {
 
     private val _currentUser = MutableStateFlow<UserProfile?>(null)
@@ -25,6 +29,9 @@ class ProfileViewModel(
 
     private val _libraryPreview = MutableStateFlow<List<LibraryItem>>(emptyList())
     val libraryPreview: StateFlow<List<LibraryItem>> = _libraryPreview.asStateFlow()
+
+    private val _favorites = MutableStateFlow<List<Favorite>>(emptyList())
+    val favorites: StateFlow<List<Favorite>> = _favorites.asStateFlow()
 
     private val _editDisplayName = MutableStateFlow("")
     val editDisplayName: StateFlow<String> = _editDisplayName.asStateFlow()
@@ -45,6 +52,14 @@ class ProfileViewModel(
             _editBio.value         = user.bio ?: ""
         }
         _libraryPreview.value = FakeMediaRepository.libraryItems.take(6)
+        refreshFavorites()
+    }
+
+    // real GET /favorites, the rest of this screen is still fake data for now
+    fun refreshFavorites() {
+        viewModelScope.launch {
+            mediaRepository.getFavorites()?.let { _favorites.value = it }
+        }
     }
 
     fun onEditDisplayNameChange(value: String) { _editDisplayName.value = value }
