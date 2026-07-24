@@ -10,27 +10,29 @@
 
 **Link:**
 
-*(paste PR link after pushing week-10)*
+https://github.com/perfettiful/media-tracker-android/pull/12
 
 ---
 
 ## Code Review
 
-**Reviewed:** *(pod mate's name)*
+**Reviewed:** *(Dustin)*
 
 **Link to my review:**
 
+https://github.com/dmarsh31/media-tracker-android/pull/13
+
 ### What I Looked At
 
-*(fill in after doing the review)*
+
 
 ### What I Noticed
 
-*(fill in after doing the review)*
+
 
 ### Comments I Left
 
-*(fill in after doing the review)*
+
 
 ---
 
