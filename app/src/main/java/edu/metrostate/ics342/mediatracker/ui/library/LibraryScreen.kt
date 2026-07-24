@@ -23,7 +23,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
 import edu.metrostate.ics342.mediatracker.data.model.LibraryItem
 import edu.metrostate.ics342.mediatracker.data.model.LibraryStatus
 import edu.metrostate.ics342.mediatracker.data.model.creatorCredit
@@ -202,12 +202,16 @@ private fun LibraryItemCard(
                     .clip(RoundedCornerShape(6.dp)),
                 contentAlignment = Alignment.Center
             ) {
-                if (item.media.coverUrl != null) {
-                    AsyncImage(
-                        model             = item.media.coverUrl,
+                if (!item.media.coverUrl.isNullOrBlank()) {
+                    // fall back to the type tile when the cover 404s or is still loading,
+                    // a blank white box reads as broken
+                    SubcomposeAsyncImage(
+                        model              = item.media.coverUrl,
                         contentDescription = item.media.title,
-                        contentScale      = ContentScale.Crop,
-                        modifier          = Modifier.fillMaxSize()
+                        contentScale       = ContentScale.Crop,
+                        modifier           = Modifier.fillMaxSize(),
+                        loading            = { MediaTypeTile(item.media.mediaType) },
+                        error              = { MediaTypeTile(item.media.mediaType) },
                     )
                 } else {
                     MediaTypeTile(item.media.mediaType)
