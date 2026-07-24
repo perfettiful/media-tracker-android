@@ -25,10 +25,8 @@ class MediaDetailViewModel(
             val reviews: List<Review>,
             // null means not in the library yet
             val libraryStatus: LibraryStatus? = null,
-            val isAddingToLibrary: Boolean = false,
             // favorites are separate from library on purpose
             val isFavorited: Boolean = false,
-            val isSaving: Boolean = false,
         ) : DetailUiState()
         data class Error(val msgResId: Int) : DetailUiState()
     }
@@ -82,36 +80,35 @@ class MediaDetailViewModel(
         }
     }
 
-    fun onSave() {
+    // optimistic toggle, the heart flips before the request even leaves.
+    // flips back if the server disagrees
+    fun onToggleSave() {
         val current = _uiState.value as? DetailUiState.Loaded ?: return
-        // already saved, or a save is mid flight, nothing to do
-        if (current.isFavorited || current.isSaving) return
+        val wasFavorited = current.isFavorited
 
-        _uiState.update { (it as DetailUiState.Loaded).copy(isSaving = true) }
+        _uiState.value = current.copy(isFavorited = !wasFavorited)
         viewModelScope.launch {
-            val saved = mediaRepository.addFavorite(current.detail.id)
-            _uiState.update { state ->
-                (state as? DetailUiState.Loaded)?.copy(
-                    isFavorited = saved,
-                    isSaving    = false,
-                ) ?: state
+            val confirmed = if (wasFavorited) mediaRepository.removeFavorite(current.detail.id)
+                            else mediaRepository.addFavorite(current.detail.id)
+            if (!confirmed) {
+                _uiState.update { state ->
+                    (state as? DetailUiState.Loaded)?.copy(isFavorited = wasFavorited) ?: state
+                }
             }
         }
     }
 
     fun onAddWantTo() {
         val current = _uiState.value as? DetailUiState.Loaded ?: return
-        // already in the library, or a request is mid flight, dont fire another
-        if (current.libraryStatus != null || current.isAddingToLibrary) return
+        if (current.libraryStatus != null) return
 
-        _uiState.update { (it as DetailUiState.Loaded).copy(isAddingToLibrary = true) }
+        // show the shelf right away, addToLibrary hands back null on a real
+        // failure which rolls this back to the add button
+        _uiState.value = current.copy(libraryStatus = LibraryStatus.WANT_TO)
         viewModelScope.launch {
-            val newStatus = mediaRepository.addToLibrary(current.detail.id, LibraryStatus.WANT_TO)
+            val confirmed = mediaRepository.addToLibrary(current.detail.id, LibraryStatus.WANT_TO)
             _uiState.update { state ->
-                (state as? DetailUiState.Loaded)?.copy(
-                    libraryStatus     = newStatus,
-                    isAddingToLibrary = false,
-                ) ?: state
+                (state as? DetailUiState.Loaded)?.copy(libraryStatus = confirmed) ?: state
             }
         }
     }

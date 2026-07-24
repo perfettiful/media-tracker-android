@@ -129,11 +129,9 @@ fun MediaDetailScreen(
                     detail        = state.detail,
                     reviews       = state.reviews,
                     libraryStatus = state.libraryStatus,
-                    isAdding      = state.isAddingToLibrary,
                     isFavorited   = state.isFavorited,
-                    isSaving      = state.isSaving,
                     onAddWantTo   = viewModel::onAddWantTo,
-                    onSave        = viewModel::onSave,
+                    onToggleSave  = viewModel::onToggleSave,
                     onWriteReview = onWriteReview
                 )
             }
@@ -146,11 +144,9 @@ private fun DetailContent(
     detail: MediaDetail,
     reviews: List<Review>,
     libraryStatus: LibraryStatus?,
-    isAdding: Boolean,
     isFavorited: Boolean,
-    isSaving: Boolean,
     onAddWantTo: () -> Unit,
-    onSave: () -> Unit,
+    onToggleSave: () -> Unit,
     onWriteReview: (Int) -> Unit
 ) {
     Column(
@@ -215,51 +211,36 @@ private fun DetailContent(
                 } else {
                     Button(
                         onClick = onAddWantTo,
-                        enabled = !isAdding,
                         shape = RoundedCornerShape(20.dp),
                         modifier = Modifier.weight(1f)
                     ) {
-                        if (isAdding) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(18.dp),
-                                strokeWidth = 2.dp
-                            )
-                        } else {
-                            Text(stringResource(R.string.detail_add_want_to))
-                        }
+                        Text(stringResource(R.string.detail_add_want_to))
                     }
                 }
+                // no spinner on purpose, the heart flips optimistically
                 OutlinedButton(
-                    onClick = onSave,
-                    enabled = !isSaving,
+                    onClick = onToggleSave,
                     shape = RoundedCornerShape(20.dp),
                     border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
                     modifier = Modifier.weight(1f)
                 ) {
-                    when {
-                        isSaving -> {
-                            CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
-                        }
-                        isFavorited -> {
-                            // filled heart once its saved, per the icon spec
-                            Icon(
-                                Icons.Filled.Favorite,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.secondary,
-                                modifier = Modifier.size(18.dp)
-                            )
-                            Spacer(Modifier.width(6.dp))
-                            Text(stringResource(R.string.detail_saved))
-                        }
-                        else -> {
-                            Icon(
-                                Icons.Outlined.FavoriteBorder,
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp)
-                            )
-                            Spacer(Modifier.width(6.dp))
-                            Text(stringResource(R.string.detail_save))
-                        }
+                    if (isFavorited) {
+                        Icon(
+                            Icons.Filled.Favorite,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.secondary,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(Modifier.width(6.dp))
+                        Text(stringResource(R.string.detail_saved))
+                    } else {
+                        Icon(
+                            Icons.Outlined.FavoriteBorder,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(Modifier.width(6.dp))
+                        Text(stringResource(R.string.detail_save))
                     }
                 }
             }
