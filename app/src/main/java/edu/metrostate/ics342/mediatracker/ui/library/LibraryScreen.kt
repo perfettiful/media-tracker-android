@@ -54,6 +54,20 @@ fun LibraryScreen(
         }
     }
 
+    val undoCandidate by viewModel.undoCandidate.collectAsState()
+    val undoMessage = undoCandidate?.let { stringResource(edu.metrostate.ics342.mediatracker.R.string.library_removed, it.media.title) }
+    val undoLabel   = stringResource(edu.metrostate.ics342.mediatracker.R.string.action_undo)
+    LaunchedEffect(undoCandidate) {
+        if (undoCandidate == null || undoMessage == null) return@LaunchedEffect
+        val tapped = snackbarHostState.showSnackbar(
+            message     = undoMessage,
+            actionLabel = undoLabel,
+            duration    = SnackbarDuration.Short,
+        )
+        if (tapped == SnackbarResult.ActionPerformed) viewModel.undoRemove()
+        else viewModel.clearUndo()
+    }
+
     // refetch when the tab comes back into view so adds from detail show up
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {

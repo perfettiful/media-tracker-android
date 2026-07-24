@@ -30,6 +30,10 @@ class LibraryViewModel(
     private val _actionError = MutableStateFlow<Int?>(null)
     val actionError: StateFlow<Int?> = _actionError.asStateFlow()
 
+    // the last thing removed, so the snackbar can offer an undo
+    private val _undoCandidate = MutableStateFlow<LibraryItem?>(null)
+    val undoCandidate: StateFlow<LibraryItem?> = _undoCandidate.asStateFlow()
+
     private val _filterState = MutableStateFlow(LibraryStatus.WANT_TO)
     val filterState: StateFlow<LibraryStatus> = _filterState.asStateFlow()
 
@@ -76,13 +80,33 @@ class LibraryViewModel(
     // and comes back (at the end, good enough) if the call fails
     fun removeItem(mediaId: Int) {
         val backup = _libraryItems.value
+        val removed = backup.find { it.mediaId == mediaId } ?: return
         _libraryItems.value = backup.filter { it.mediaId != mediaId }
+        _undoCandidate.value = removed
         viewModelScope.launch {
             if (!mediaRepository.removeFromLibrary(mediaId)) {
                 _libraryItems.value = backup
+                _undoCandidate.value = null
                 _actionError.value = R.string.library_remove_failed
             }
         }
+    }
+
+    // undo is just an optimistic add in the other direction
+    fun undoRemove() {
+        val removed = _undoCandidate.value ?: return
+        _undoCandidate.value = null
+        _libraryItems.value = _libraryItems.value + removed
+        viewModelScope.launch {
+            if (mediaRepository.addToLibrary(removed.mediaId, removed.status) == null) {
+                _libraryItems.value = _libraryItems.value.filter { it.mediaId != removed.mediaId }
+                _actionError.value = R.string.library_undo_failed
+            }
+        }
+    }
+
+    fun clearUndo() {
+        _undoCandidate.value = null
     }
 
     // same trick. the list is server filtered by status, so a status change
