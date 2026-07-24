@@ -40,9 +40,19 @@ fun LibraryScreen(
     val items          by viewModel.libraryItems.collectAsState()
     val isLoading      by viewModel.isLoading.collectAsState()
     val errorMessage   by viewModel.errorMessage.collectAsState()
+    val actionError    by viewModel.actionError.collectAsState()
     val selectedStatus by viewModel.filterState.collectAsState()
 
     var selectedType by rememberSaveable { mutableStateOf("all") }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val actionErrorText = actionError?.let { stringResource(it) }
+    LaunchedEffect(actionErrorText) {
+        actionErrorText?.let {
+            snackbarHostState.showSnackbar(message = it, duration = SnackbarDuration.Short)
+            viewModel.clearActionError()
+        }
+    }
 
     // refetch when the tab comes back into view so adds from detail show up
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -54,7 +64,20 @@ fun LibraryScreen(
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(snackbarHostState) { data ->
+                Snackbar(
+                    snackbarData   = data,
+                    modifier       = Modifier.padding(12.dp),
+                    shape          = RoundedCornerShape(12.dp),
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor   = MaterialTheme.colorScheme.onPrimaryContainer,
+                )
+            }
+        },
+    ) { innerPadding ->
+    Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
         TopAppBar(title = { Text(stringResource(edu.metrostate.ics342.mediatracker.R.string.library_title)) })
 
         MediaTypeFilterChips(
@@ -155,6 +178,7 @@ fun LibraryScreen(
                 )
             }
         }
+    }
     }
 }
 

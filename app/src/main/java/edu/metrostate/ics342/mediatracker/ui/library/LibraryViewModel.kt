@@ -26,6 +26,10 @@ class LibraryViewModel(
     private val _errorMessage = MutableStateFlow<Int?>(null)
     val errorMessage: StateFlow<Int?> = _errorMessage.asStateFlow()
 
+    // rollback complaints, shown as a snackbar not the full error screen
+    private val _actionError = MutableStateFlow<Int?>(null)
+    val actionError: StateFlow<Int?> = _actionError.asStateFlow()
+
     private val _filterState = MutableStateFlow(LibraryStatus.WANT_TO)
     val filterState: StateFlow<LibraryStatus> = _filterState.asStateFlow()
 
@@ -68,7 +72,35 @@ class LibraryViewModel(
         loadLibrary()
     }
 
-    // next part of tonight wires PUT /library/{mediaId} and DELETE, inert until then
-    fun removeItem(mediaId: Int) { }
-    fun updateStatus(mediaId: Int, newStatus: LibraryStatus) { }
+    // optimistic: the item leaves the list before the server answers,
+    // and comes back (at the end, good enough) if the call fails
+    fun removeItem(mediaId: Int) {
+        val backup = _libraryItems.value
+        _libraryItems.value = backup.filter { it.mediaId != mediaId }
+        viewModelScope.launch {
+            if (!mediaRepository.removeFromLibrary(mediaId)) {
+                _libraryItems.value = backup
+                _actionError.value = R.string.library_remove_failed
+            }
+        }
+    }
+
+    // same trick. the list is server filtered by status, so a status change
+    // means the item doesnt belong on this tab anymore
+    fun updateStatus(mediaId: Int, newStatus: LibraryStatus) {
+        val backup = _libraryItems.value
+        val target = backup.find { it.mediaId == mediaId } ?: return
+        if (target.status == newStatus) return
+        _libraryItems.value = backup.filter { it.mediaId != mediaId }
+        viewModelScope.launch {
+            if (!mediaRepository.updateLibraryStatus(mediaId, newStatus)) {
+                _libraryItems.value = backup
+                _actionError.value = R.string.library_status_failed
+            }
+        }
+    }
+
+    fun clearActionError() {
+        _actionError.value = null
+    }
 }
