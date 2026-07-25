@@ -11,6 +11,9 @@ interface MediaRepository {
     suspend fun searchMedia(query: String?, type: String?, after: String?): SearchPage
     suspend fun getMediaDetail(id: Int): DetailResult
 
+    // best effort, failures degrade to an empty list instead of sinking the screen
+    suspend fun getReviews(mediaId: Int): List<Review>
+
     // null means not in the library (or we couldnt check, same ui either way)
     suspend fun getLibraryStatus(mediaId: Int): LibraryStatus?
 
@@ -58,10 +61,7 @@ sealed interface PostReviewResult {
 }
 
 sealed interface DetailResult {
-    data class Success(
-        val detail: MediaDetail,
-        val reviews: List<Review>,
-    ) : DetailResult
+    data class Success(val detail: MediaDetail) : DetailResult
 
     // a 404 on /media/{id} is a real "this doesnt exist", unlike the library check
     data object NotFound : DetailResult

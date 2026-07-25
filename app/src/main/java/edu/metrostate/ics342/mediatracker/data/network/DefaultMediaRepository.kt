@@ -10,6 +10,7 @@ import edu.metrostate.ics342.mediatracker.data.model.AddLibraryRequest
 import edu.metrostate.ics342.mediatracker.data.model.AddReviewRequest
 import edu.metrostate.ics342.mediatracker.data.model.Favorite
 import edu.metrostate.ics342.mediatracker.data.model.LibraryStatus
+import edu.metrostate.ics342.mediatracker.data.model.Review
 import edu.metrostate.ics342.mediatracker.data.model.UpdateLibraryRequest
 import java.io.IOException
 
@@ -49,17 +50,20 @@ class DefaultMediaRepository(
             if (!detailResponse.isSuccessful || detail == null) {
                 return DetailResult.UnknownError
             }
-            // reviews failing shouldnt sink the whole screen, degrade to none
-            val reviews = try {
-                service.getReviews(id).body() ?: emptyList()
-            } catch (e: Exception) {
-                emptyList()
-            }
-            DetailResult.Success(detail, reviews)
+            DetailResult.Success(detail)
         } catch (e: IOException) {
             DetailResult.NetworkError
         } catch (e: Exception) {
             DetailResult.UnknownError
+        }
+    }
+
+    override suspend fun getReviews(mediaId: Int): List<Review> {
+        // reviews failing shouldnt sink the whole screen, degrade to none
+        return try {
+            service.getReviews(mediaId).body() ?: emptyList()
+        } catch (e: Exception) {
+            emptyList()
         }
     }
 

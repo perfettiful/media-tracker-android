@@ -9,6 +9,7 @@ import edu.metrostate.ics342.mediatracker.data.model.LibraryStatus
 import edu.metrostate.ics342.mediatracker.data.model.MediaDetail
 import edu.metrostate.ics342.mediatracker.data.model.Review
 import edu.metrostate.ics342.mediatracker.data.network.DefaultMediaRepository
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -59,12 +60,26 @@ class MediaDetailViewModel(
         loadedId = mediaId
         viewModelScope.launch {
             _uiState.value = DetailUiState.Loading
-            _uiState.value = when (val result = mediaRepository.getMediaDetail(mediaId)) {
+
+            // all four fire together instead of stacking round trips.
+            // only the detail call can fail the screen, the rest are best effort
+            val detailAsync   = async { mediaRepository.getMediaDetail(mediaId) }
+            val reviewsAsync  = async { mediaRepository.getReviews(mediaId) }
+            val statusAsync   = async { mediaRepository.getLibraryStatus(mediaId) }
+            val favoriteAsync = async { mediaRepository.isFavorited(mediaId) }
+
+            val result = detailAsync.await()
+            if (result !is DetailResult.Success) {
+                reviewsAsync.cancel()
+                statusAsync.cancel()
+                favoriteAsync.cancel()
+            }
+            _uiState.value = when (result) {
                 is DetailResult.Success -> DetailUiState.Loaded(
                     detail        = result.detail,
-                    reviews       = result.reviews,
-                    libraryStatus = mediaRepository.getLibraryStatus(mediaId),
-                    isFavorited   = mediaRepository.isFavorited(mediaId),
+                    reviews       = reviewsAsync.await(),
+                    libraryStatus = statusAsync.await(),
+                    isFavorited   = favoriteAsync.await(),
                 )
                 DetailResult.NotFound     -> DetailUiState.NotFound
                 DetailResult.NetworkError -> DetailUiState.Error(R.string.error_network)
@@ -79,14 +94,23 @@ class MediaDetailViewModel(
         val id = loadedId ?: return
         if (_uiState.value !is DetailUiState.Loaded) return
         viewModelScope.launch {
-            val result = mediaRepository.getMediaDetail(id)
+            val detailAsync   = async { mediaRepository.getMediaDetail(id) }
+            val reviewsAsync  = async { mediaRepository.getReviews(id) }
+            val statusAsync   = async { mediaRepository.getLibraryStatus(id) }
+            val favoriteAsync = async { mediaRepository.isFavorited(id) }
+
+            val result = detailAsync.await()
             if (result is DetailResult.Success) {
                 _uiState.value = DetailUiState.Loaded(
                     detail        = result.detail,
-                    reviews       = result.reviews,
-                    libraryStatus = mediaRepository.getLibraryStatus(id),
-                    isFavorited   = mediaRepository.isFavorited(id),
+                    reviews       = reviewsAsync.await(),
+                    libraryStatus = statusAsync.await(),
+                    isFavorited   = favoriteAsync.await(),
                 )
+            } else {
+                reviewsAsync.cancel()
+                statusAsync.cancel()
+                favoriteAsync.cancel()
             }
         }
     }
