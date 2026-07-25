@@ -25,6 +25,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -60,9 +61,19 @@ fun MediaDetailScreen(
     viewModel: MediaDetailViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val actionError by viewModel.actionError.collectAsState()
 
     LaunchedEffect(mediaId) {
         viewModel.load(mediaId)
+    }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val actionErrorText = actionError?.let { stringResource(it) }
+    LaunchedEffect(actionErrorText) {
+        actionErrorText?.let {
+            snackbarHostState.showSnackbar(message = it, duration = SnackbarDuration.Short)
+            viewModel.clearActionError()
+        }
     }
 
     // refetch when we come back into view, e.g. after posting a review.
@@ -76,7 +87,20 @@ fun MediaDetailScreen(
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(snackbarHostState) { data ->
+                Snackbar(
+                    snackbarData   = data,
+                    modifier       = Modifier.padding(12.dp),
+                    shape          = RoundedCornerShape(12.dp),
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor   = MaterialTheme.colorScheme.onPrimaryContainer,
+                )
+            }
+        },
+    ) { innerPadding ->
+    Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
         TopAppBar(
             title = {},
             navigationIcon = {
@@ -136,6 +160,7 @@ fun MediaDetailScreen(
                 )
             }
         }
+    }
     }
 }
 

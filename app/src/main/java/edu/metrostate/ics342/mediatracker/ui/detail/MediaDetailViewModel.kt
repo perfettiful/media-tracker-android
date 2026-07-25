@@ -34,7 +34,15 @@ class MediaDetailViewModel(
     private val _uiState = MutableStateFlow<DetailUiState>(DetailUiState.Loading)
     val uiState = _uiState.asStateFlow()
 
+    // rollback complaints, same snackbar treatment the library screen uses
+    private val _actionError = MutableStateFlow<Int?>(null)
+    val actionError = _actionError.asStateFlow()
+
     private var loadedId: Int? = null
+
+    fun clearActionError() {
+        _actionError.value = null
+    }
 
     // error state retry, drop the guard so load actually refetches
     fun retry() {
@@ -94,6 +102,7 @@ class MediaDetailViewModel(
                 _uiState.update { state ->
                     (state as? DetailUiState.Loaded)?.copy(isFavorited = wasFavorited) ?: state
                 }
+                _actionError.value = R.string.detail_save_failed
             }
         }
     }
@@ -110,6 +119,7 @@ class MediaDetailViewModel(
             _uiState.update { state ->
                 (state as? DetailUiState.Loaded)?.copy(libraryStatus = confirmed) ?: state
             }
+            if (confirmed == null) _actionError.value = R.string.detail_add_failed
         }
     }
 }
