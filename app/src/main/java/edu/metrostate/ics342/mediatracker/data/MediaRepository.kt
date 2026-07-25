@@ -63,6 +63,8 @@ sealed interface DetailResult {
         val reviews: List<Review>,
     ) : DetailResult
 
+    // a 404 on /media/{id} is a real "this doesnt exist", unlike the library check
+    data object NotFound : DetailResult
     data object NetworkError : DetailResult
     data object UnknownError : DetailResult
 }

@@ -128,6 +128,17 @@ fun MediaDetailScreen(
                 }
             }
 
+            is MediaDetailViewModel.DetailUiState.NotFound -> {
+                Box(Modifier.fillMaxSize().padding(32.dp), contentAlignment = Alignment.Center) {
+                    Text(
+                        stringResource(R.string.detail_not_found),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+
             is MediaDetailViewModel.DetailUiState.Error -> {
                 Column(
                     modifier = Modifier.fillMaxSize().padding(32.dp),

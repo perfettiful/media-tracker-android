@@ -44,6 +44,7 @@ class DefaultMediaRepository(
     override suspend fun getMediaDetail(id: Int): DetailResult {
         return try {
             val detailResponse = service.getMediaDetail(id)
+            if (detailResponse.code() == 404) return DetailResult.NotFound
             val detail = detailResponse.body()
             if (!detailResponse.isSuccessful || detail == null) {
                 return DetailResult.UnknownError

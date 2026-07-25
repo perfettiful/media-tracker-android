@@ -146,6 +146,7 @@
     <string name="detail_stat_genre">Genre</string>
     <string name="detail_runtime_minutes">%1$d min</string>
     <string name="detail_failed">Couldn\'t load this title. Try again.</string>
+    <string name="detail_not_found">This title doesn\'t exist. It may have been removed.</string>
     <string name="action_retry">Retry</string>
     <string name="detail_add_failed">Couldn\'t add that. Try again.</string>
     <string name="detail_save_failed">Couldn\'t update the save. Try again.</string>

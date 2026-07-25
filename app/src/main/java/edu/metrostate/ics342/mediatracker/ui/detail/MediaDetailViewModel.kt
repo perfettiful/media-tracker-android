@@ -28,6 +28,8 @@ class MediaDetailViewModel(
             // favorites are separate from library on purpose
             val isFavorited: Boolean = false,
         ) : DetailUiState()
+        // 404 on the detail itself, retry wont help so it gets its own state
+        data object NotFound : DetailUiState()
         data class Error(val msgResId: Int) : DetailUiState()
     }
 
@@ -64,6 +66,7 @@ class MediaDetailViewModel(
                     libraryStatus = mediaRepository.getLibraryStatus(mediaId),
                     isFavorited   = mediaRepository.isFavorited(mediaId),
                 )
+                DetailResult.NotFound     -> DetailUiState.NotFound
                 DetailResult.NetworkError -> DetailUiState.Error(R.string.error_network)
                 DetailResult.UnknownError -> DetailUiState.Error(R.string.detail_failed)
             }
