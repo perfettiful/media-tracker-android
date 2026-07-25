@@ -22,6 +22,12 @@ data class AddLibraryRequest(
     val status: String,
 )
 
+// body for PUT /library/{mediaId}, the id rides in the path
+@Serializable
+data class UpdateLibraryRequest(
+    val status: String,
+)
+
 @Serializable
 enum class LibraryStatus(@param:StringRes val labelRes: Int) {
     @SerialName("want_to")     WANT_TO(R.string.status_want_to),

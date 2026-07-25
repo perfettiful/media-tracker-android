@@ -1,12 +1,17 @@
 package edu.metrostate.ics342.mediatracker.data.network
 
 import edu.metrostate.ics342.mediatracker.data.DetailResult
+import edu.metrostate.ics342.mediatracker.data.LibraryResult
 import edu.metrostate.ics342.mediatracker.data.MediaRepository
 import edu.metrostate.ics342.mediatracker.data.PostReviewResult
 import edu.metrostate.ics342.mediatracker.data.SearchPage
+import edu.metrostate.ics342.mediatracker.data.model.AddFavoriteRequest
 import edu.metrostate.ics342.mediatracker.data.model.AddLibraryRequest
 import edu.metrostate.ics342.mediatracker.data.model.AddReviewRequest
+import edu.metrostate.ics342.mediatracker.data.model.Favorite
 import edu.metrostate.ics342.mediatracker.data.model.LibraryStatus
+import edu.metrostate.ics342.mediatracker.data.model.Review
+import edu.metrostate.ics342.mediatracker.data.model.UpdateLibraryRequest
 import java.io.IOException
 
 class DefaultMediaRepository(
@@ -40,21 +45,25 @@ class DefaultMediaRepository(
     override suspend fun getMediaDetail(id: Int): DetailResult {
         return try {
             val detailResponse = service.getMediaDetail(id)
+            if (detailResponse.code() == 404) return DetailResult.NotFound
             val detail = detailResponse.body()
             if (!detailResponse.isSuccessful || detail == null) {
                 return DetailResult.UnknownError
             }
-            // reviews failing shouldnt sink the whole screen, degrade to none
-            val reviews = try {
-                service.getReviews(id).body() ?: emptyList()
-            } catch (e: Exception) {
-                emptyList()
-            }
-            DetailResult.Success(detail, reviews)
+            DetailResult.Success(detail)
         } catch (e: IOException) {
             DetailResult.NetworkError
         } catch (e: Exception) {
             DetailResult.UnknownError
+        }
+    }
+
+    override suspend fun getReviews(mediaId: Int): List<Review> {
+        // reviews failing shouldnt sink the whole screen, degrade to none
+        return try {
+            service.getReviews(mediaId).body() ?: emptyList()
+        } catch (e: Exception) {
+            emptyList()
         }
     }
 
@@ -81,6 +90,77 @@ class DefaultMediaRepository(
             }
         } catch (e: Exception) {
             null
+        }
+    }
+
+    override suspend fun isFavorited(mediaId: Int): Boolean {
+        return try {
+            // 404 just means not favorited, same deal as the library check
+            service.getFavorite(mediaId).isSuccessful
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    override suspend fun addFavorite(mediaId: Int): Boolean {
+        return try {
+            val response = service.addFavorite(AddFavoriteRequest(mediaId))
+            // 409 means already saved, which is the state we wanted anyway
+            response.isSuccessful || response.code() == 409
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    override suspend fun removeFavorite(mediaId: Int): Boolean {
+        return try {
+            val response = service.removeFavorite(mediaId)
+            // 404 means it was never saved, end state is the same
+            response.isSuccessful || response.code() == 404
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    override suspend fun getFavorites(): List<Favorite>? {
+        return try {
+            val response = service.getFavorites()
+            if (response.isSuccessful) response.body() else null
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    override suspend fun updateLibraryStatus(mediaId: Int, status: LibraryStatus): Boolean {
+        return try {
+            service.updateLibraryItem(mediaId, UpdateLibraryRequest(status.toApiString())).isSuccessful
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    override suspend fun removeFromLibrary(mediaId: Int): Boolean {
+        return try {
+            val response = service.removeFromLibrary(mediaId)
+            response.isSuccessful || response.code() == 404
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    override suspend fun getLibrary(status: LibraryStatus?): LibraryResult {
+        return try {
+            val response = service.getLibrary(status?.toApiString())
+            val items = response.body()
+            if (response.isSuccessful && items != null) {
+                LibraryResult.Success(items)
+            } else {
+                LibraryResult.UnknownError
+            }
+        } catch (e: IOException) {
+            LibraryResult.NetworkError
+        } catch (e: Exception) {
+            LibraryResult.UnknownError
         }
     }
 

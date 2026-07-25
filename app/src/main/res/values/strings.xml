@@ -46,6 +46,13 @@
     <string name="filter_movies">Movies</string>
     <string name="filter_shows">Shows</string>
     <string name="library_empty">Nothing here yet.\nSearch for something to add.</string>
+    <string name="library_empty_filtered">Nothing in \'%1$s\' yet.\nSearch for something to add.</string>
+    <string name="library_failed">Couldn\'t load your library. Try again.</string>
+    <string name="library_remove_failed">Couldn\'t remove that. Try again.</string>
+    <string name="library_status_failed">Couldn\'t change the status. Try again.</string>
+    <string name="library_removed">Removed \"%1$s\"</string>
+    <string name="library_undo_failed">Couldn\'t bring that back. Try again.</string>
+    <string name="action_undo">Undo</string>
     <string name="library_items_count">%1$d items</string>
     <string name="library_item_count">%1$d item</string>
     <string name="action_more_options">More options</string>
@@ -59,6 +66,8 @@
     <string name="profile_following">Following</string>
     <string name="profile_tracked">Tracked</string>
     <string name="profile_edit_button">Edit Profile</string>
+    <string name="profile_favorites">Favorites</string>
+    <string name="profile_no_favorites">Nothing saved yet. Tap the heart on any title.</string>
     <string name="profile_recently_tracked">Recently tracked</string>
     <string name="profile_nothing_tracked">Nothing tracked yet.</string>
     <string name="profile_user_not_found">User not found.</string>
@@ -124,6 +133,7 @@
     <!-- Media Detail -->
     <string name="detail_add_want_to">+ Want to</string>
     <string name="detail_save">Save</string>
+    <string name="detail_saved">Saved</string>
     <string name="detail_about">About</string>
     <string name="detail_not_yet_rated">Not yet rated</string>
     <string name="detail_reviews_count">Reviews (%1$d)</string>
@@ -136,7 +146,10 @@
     <string name="detail_stat_genre">Genre</string>
     <string name="detail_runtime_minutes">%1$d min</string>
     <string name="detail_failed">Couldn\'t load this title. Try again.</string>
+    <string name="detail_not_found">This title doesn\'t exist. It may have been removed.</string>
     <string name="action_retry">Retry</string>
+    <string name="detail_add_failed">Couldn\'t add that. Try again.</string>
+    <string name="detail_save_failed">Couldn\'t update the save. Try again.</string>
     <string name="error_already_reviewed">You already reviewed this one.</string>
     <string name="error_review_failed">Couldn\'t post your review. Try again.</string>
 

@@ -9,6 +9,7 @@ import edu.metrostate.ics342.mediatracker.data.model.LibraryStatus
 import edu.metrostate.ics342.mediatracker.data.model.MediaDetail
 import edu.metrostate.ics342.mediatracker.data.model.Review
 import edu.metrostate.ics342.mediatracker.data.network.DefaultMediaRepository
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -25,15 +26,26 @@ class MediaDetailViewModel(
             val reviews: List<Review>,
             // null means not in the library yet
             val libraryStatus: LibraryStatus? = null,
-            val isAddingToLibrary: Boolean = false,
+            // favorites are separate from library on purpose
+            val isFavorited: Boolean = false,
         ) : DetailUiState()
+        // 404 on the detail itself, retry wont help so it gets its own state
+        data object NotFound : DetailUiState()
         data class Error(val msgResId: Int) : DetailUiState()
     }
 
     private val _uiState = MutableStateFlow<DetailUiState>(DetailUiState.Loading)
     val uiState = _uiState.asStateFlow()
 
+    // rollback complaints, same snackbar treatment the library screen uses
+    private val _actionError = MutableStateFlow<Int?>(null)
+    val actionError = _actionError.asStateFlow()
+
     private var loadedId: Int? = null
+
+    fun clearActionError() {
+        _actionError.value = null
+    }
 
     // error state retry, drop the guard so load actually refetches
     fun retry() {
@@ -48,12 +60,28 @@ class MediaDetailViewModel(
         loadedId = mediaId
         viewModelScope.launch {
             _uiState.value = DetailUiState.Loading
-            _uiState.value = when (val result = mediaRepository.getMediaDetail(mediaId)) {
+
+            // all four fire together instead of stacking round trips.
+            // only the detail call can fail the screen, the rest are best effort
+            val detailAsync   = async { mediaRepository.getMediaDetail(mediaId) }
+            val reviewsAsync  = async { mediaRepository.getReviews(mediaId) }
+            val statusAsync   = async { mediaRepository.getLibraryStatus(mediaId) }
+            val favoriteAsync = async { mediaRepository.isFavorited(mediaId) }
+
+            val result = detailAsync.await()
+            if (result !is DetailResult.Success) {
+                reviewsAsync.cancel()
+                statusAsync.cancel()
+                favoriteAsync.cancel()
+            }
+            _uiState.value = when (result) {
                 is DetailResult.Success -> DetailUiState.Loaded(
                     detail        = result.detail,
-                    reviews       = result.reviews,
-                    libraryStatus = mediaRepository.getLibraryStatus(mediaId),
+                    reviews       = reviewsAsync.await(),
+                    libraryStatus = statusAsync.await(),
+                    isFavorited   = favoriteAsync.await(),
                 )
+                DetailResult.NotFound     -> DetailUiState.NotFound
                 DetailResult.NetworkError -> DetailUiState.Error(R.string.error_network)
                 DetailResult.UnknownError -> DetailUiState.Error(R.string.detail_failed)
             }
@@ -66,31 +94,59 @@ class MediaDetailViewModel(
         val id = loadedId ?: return
         if (_uiState.value !is DetailUiState.Loaded) return
         viewModelScope.launch {
-            val result = mediaRepository.getMediaDetail(id)
+            val detailAsync   = async { mediaRepository.getMediaDetail(id) }
+            val reviewsAsync  = async { mediaRepository.getReviews(id) }
+            val statusAsync   = async { mediaRepository.getLibraryStatus(id) }
+            val favoriteAsync = async { mediaRepository.isFavorited(id) }
+
+            val result = detailAsync.await()
             if (result is DetailResult.Success) {
                 _uiState.value = DetailUiState.Loaded(
                     detail        = result.detail,
-                    reviews       = result.reviews,
-                    libraryStatus = mediaRepository.getLibraryStatus(id),
+                    reviews       = reviewsAsync.await(),
+                    libraryStatus = statusAsync.await(),
+                    isFavorited   = favoriteAsync.await(),
                 )
+            } else {
+                reviewsAsync.cancel()
+                statusAsync.cancel()
+                favoriteAsync.cancel()
+            }
+        }
+    }
+
+    // optimistic toggle, the heart flips before the request even leaves.
+    // flips back if the server disagrees
+    fun onToggleSave() {
+        val current = _uiState.value as? DetailUiState.Loaded ?: return
+        val wasFavorited = current.isFavorited
+
+        _uiState.value = current.copy(isFavorited = !wasFavorited)
+        viewModelScope.launch {
+            val confirmed = if (wasFavorited) mediaRepository.removeFavorite(current.detail.id)
+                            else mediaRepository.addFavorite(current.detail.id)
+            if (!confirmed) {
+                _uiState.update { state ->
+                    (state as? DetailUiState.Loaded)?.copy(isFavorited = wasFavorited) ?: state
+                }
+                _actionError.value = R.string.detail_save_failed
             }
         }
     }
 
     fun onAddWantTo() {
         val current = _uiState.value as? DetailUiState.Loaded ?: return
-        // already in the library, or a request is mid flight, dont fire another
-        if (current.libraryStatus != null || current.isAddingToLibrary) return
+        if (current.libraryStatus != null) return
 
-        _uiState.update { (it as DetailUiState.Loaded).copy(isAddingToLibrary = true) }
+        // show the shelf right away, addToLibrary hands back null on a real
+        // failure which rolls this back to the add button
+        _uiState.value = current.copy(libraryStatus = LibraryStatus.WANT_TO)
         viewModelScope.launch {
-            val newStatus = mediaRepository.addToLibrary(current.detail.id, LibraryStatus.WANT_TO)
+            val confirmed = mediaRepository.addToLibrary(current.detail.id, LibraryStatus.WANT_TO)
             _uiState.update { state ->
-                (state as? DetailUiState.Loaded)?.copy(
-                    libraryStatus     = newStatus,
-                    isAddingToLibrary = false,
-                ) ?: state
+                (state as? DetailUiState.Loaded)?.copy(libraryStatus = confirmed) ?: state
             }
+            if (confirmed == null) _actionError.value = R.string.detail_add_failed
         }
     }
 }

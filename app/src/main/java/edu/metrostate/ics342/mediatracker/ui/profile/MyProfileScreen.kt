@@ -17,9 +17,16 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
+import edu.metrostate.ics342.mediatracker.ui.search.MediaTypeTile
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,8 +35,19 @@ fun MyProfileScreen(
     onSettingsClick: () -> Unit,
     viewModel: ProfileViewModel = viewModel(factory = ProfileViewModel.Factory)
 ) {
-    val user    by viewModel.currentUser.collectAsStateWithLifecycle()
-    val library by viewModel.libraryPreview.collectAsStateWithLifecycle()
+    val user      by viewModel.currentUser.collectAsStateWithLifecycle()
+    val library   by viewModel.libraryPreview.collectAsStateWithLifecycle()
+    val favorites by viewModel.favorites.collectAsStateWithLifecycle()
+
+    // catch saves made on detail since we were last here
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) viewModel.refreshFavorites()
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
 
     Column(modifier = Modifier.fillMaxSize()) {
         TopAppBar(
@@ -120,6 +138,47 @@ fun MyProfileScreen(
             Spacer(Modifier.height(24.dp))
             HorizontalDivider()
             Spacer(Modifier.height(16.dp))
+
+            Text(stringResource(edu.metrostate.ics342.mediatracker.R.string.profile_favorites), style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.align(Alignment.Start))
+
+            Spacer(Modifier.height(8.dp))
+
+            if (favorites.isEmpty()) {
+                Text(stringResource(edu.metrostate.ics342.mediatracker.R.string.profile_no_favorites),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.align(Alignment.Start))
+            } else {
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    items(favorites.mapNotNull { it.media }, key = { it.id }) { media ->
+                        Box(
+                            modifier = Modifier
+                                .size(64.dp, 90.dp)
+                                .clip(RoundedCornerShape(6.dp)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (!media.coverUrl.isNullOrBlank()) {
+                                SubcomposeAsyncImage(
+                                    model              = media.coverUrl,
+                                    contentDescription = media.title,
+                                    contentScale       = ContentScale.Crop,
+                                    modifier           = Modifier.fillMaxSize(),
+                                    loading            = { MediaTypeTile(media.mediaType) },
+                                    error              = { MediaTypeTile(media.mediaType) },
+                                )
+                            } else {
+                                MediaTypeTile(media.mediaType)
+                            }
+                        }
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(20.dp))
 
             Text(stringResource(edu.metrostate.ics342.mediatracker.R.string.profile_recently_tracked), style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.align(Alignment.Start))

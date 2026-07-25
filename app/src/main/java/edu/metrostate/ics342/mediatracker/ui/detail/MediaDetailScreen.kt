@@ -9,7 +9,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.MenuBook
 import androidx.compose.material.icons.outlined.MoreVert
@@ -23,6 +25,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,7 +44,12 @@ import edu.metrostate.ics342.mediatracker.data.model.LibraryStatus
 import edu.metrostate.ics342.mediatracker.data.model.MediaDetail
 import edu.metrostate.ics342.mediatracker.data.model.Review
 import edu.metrostate.ics342.mediatracker.data.model.creatorCredit
-import edu.metrostate.ics342.mediatracker.ui.StatusBadge
+import edu.metrostate.ics342.mediatracker.theme.Finished
+import edu.metrostate.ics342.mediatracker.theme.FinishedContainer
+import edu.metrostate.ics342.mediatracker.theme.InProgress
+import edu.metrostate.ics342.mediatracker.theme.InProgressContainer
+import edu.metrostate.ics342.mediatracker.theme.WantTo
+import edu.metrostate.ics342.mediatracker.theme.WantToContainer
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,9 +61,19 @@ fun MediaDetailScreen(
     viewModel: MediaDetailViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val actionError by viewModel.actionError.collectAsState()
 
     LaunchedEffect(mediaId) {
         viewModel.load(mediaId)
+    }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val actionErrorText = actionError?.let { stringResource(it) }
+    LaunchedEffect(actionErrorText) {
+        actionErrorText?.let {
+            snackbarHostState.showSnackbar(message = it, duration = SnackbarDuration.Short)
+            viewModel.clearActionError()
+        }
     }
 
     // refetch when we come back into view, e.g. after posting a review.
@@ -69,7 +87,20 @@ fun MediaDetailScreen(
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(snackbarHostState) { data ->
+                Snackbar(
+                    snackbarData   = data,
+                    modifier       = Modifier.padding(12.dp),
+                    shape          = RoundedCornerShape(12.dp),
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor   = MaterialTheme.colorScheme.onPrimaryContainer,
+                )
+            }
+        },
+    ) { innerPadding ->
+    Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
         TopAppBar(
             title = {},
             navigationIcon = {
@@ -94,6 +125,17 @@ fun MediaDetailScreen(
             is MediaDetailViewModel.DetailUiState.Loading -> {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
+                }
+            }
+
+            is MediaDetailViewModel.DetailUiState.NotFound -> {
+                Box(Modifier.fillMaxSize().padding(32.dp), contentAlignment = Alignment.Center) {
+                    Text(
+                        stringResource(R.string.detail_not_found),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center
+                    )
                 }
             }
 
@@ -122,12 +164,14 @@ fun MediaDetailScreen(
                     detail        = state.detail,
                     reviews       = state.reviews,
                     libraryStatus = state.libraryStatus,
-                    isAdding      = state.isAddingToLibrary,
+                    isFavorited   = state.isFavorited,
                     onAddWantTo   = viewModel::onAddWantTo,
+                    onToggleSave  = viewModel::onToggleSave,
                     onWriteReview = onWriteReview
                 )
             }
         }
+    }
     }
 }
 
@@ -136,8 +180,9 @@ private fun DetailContent(
     detail: MediaDetail,
     reviews: List<Review>,
     libraryStatus: LibraryStatus?,
-    isAdding: Boolean,
+    isFavorited: Boolean,
     onAddWantTo: () -> Unit,
+    onToggleSave: () -> Unit,
     onWriteReview: (Int) -> Unit
 ) {
     Column(
@@ -179,40 +224,60 @@ private fun DetailContent(
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 if (libraryStatus != null) {
-                    // already in the library, show which shelf instead of the add button
-                    Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                        StatusBadge(status = libraryStatus)
+                    // already in the library, same pill shape but status colors and a check
+                    val (container, content) = when (libraryStatus) {
+                        LibraryStatus.WANT_TO     -> WantToContainer to WantTo
+                        LibraryStatus.IN_PROGRESS -> InProgressContainer to InProgress
+                        LibraryStatus.FINISHED    -> FinishedContainer to Finished
+                    }
+                    Button(
+                        onClick = {},
+                        enabled = false,
+                        shape = RoundedCornerShape(20.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            disabledContainerColor = container,
+                            disabledContentColor   = content,
+                        ),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Icon(Icons.Filled.Check, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(6.dp))
+                        Text(stringResource(libraryStatus.labelRes))
                     }
                 } else {
                     Button(
                         onClick = onAddWantTo,
-                        enabled = !isAdding,
                         shape = RoundedCornerShape(20.dp),
                         modifier = Modifier.weight(1f)
                     ) {
-                        if (isAdding) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(18.dp),
-                                strokeWidth = 2.dp
-                            )
-                        } else {
-                            Text(stringResource(R.string.detail_add_want_to))
-                        }
+                        Text(stringResource(R.string.detail_add_want_to))
                     }
                 }
+                // no spinner on purpose, the heart flips optimistically
                 OutlinedButton(
-                    onClick = { /* TODO: save */ },
+                    onClick = onToggleSave,
                     shape = RoundedCornerShape(20.dp),
                     border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
                     modifier = Modifier.weight(1f)
                 ) {
-                    Icon(
-                        Icons.Outlined.FavoriteBorder,
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(Modifier.width(6.dp))
-                    Text(stringResource(R.string.detail_save))
+                    if (isFavorited) {
+                        Icon(
+                            Icons.Filled.Favorite,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.secondary,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(Modifier.width(6.dp))
+                        Text(stringResource(R.string.detail_saved))
+                    } else {
+                        Icon(
+                            Icons.Outlined.FavoriteBorder,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(Modifier.width(6.dp))
+                        Text(stringResource(R.string.detail_save))
+                    }
                 }
             }
 
