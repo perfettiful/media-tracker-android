@@ -142,6 +142,10 @@ private fun PriorityFilterChips(
             selected = selected == null,
             onClick  = { onSelect(null) },
             shape    = RoundedCornerShape(8.dp),
+            colors   = FilterChipDefaults.filterChipColors(
+                selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                selectedLabelColor     = MaterialTheme.colorScheme.onPrimaryContainer,
+            ),
             label    = { Text(stringResource(R.string.filter_all)) }
         )
         PriorityLevel.entries.forEach { level ->
@@ -149,6 +153,10 @@ private fun PriorityFilterChips(
                 selected = selected == level,
                 onClick  = { onSelect(level) },
                 shape    = RoundedCornerShape(8.dp),
+                colors   = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                    selectedLabelColor     = MaterialTheme.colorScheme.onPrimaryContainer,
+                ),
                 leadingIcon = {
                     Box(Modifier.size(10.dp).clip(CircleShape).background(level.dotColor()))
                 },
