@@ -5,7 +5,9 @@ import edu.metrostate.ics342.mediatracker.data.model.LibraryItem
 import edu.metrostate.ics342.mediatracker.data.model.LibraryStatus
 import edu.metrostate.ics342.mediatracker.data.model.Media
 import edu.metrostate.ics342.mediatracker.data.model.MediaDetail
+import edu.metrostate.ics342.mediatracker.data.model.Priority
 import edu.metrostate.ics342.mediatracker.data.model.Review
+import edu.metrostate.ics342.mediatracker.data.model.UpdatePriorityRequest
 
 interface MediaRepository {
     suspend fun searchMedia(query: String?, type: String?, after: String?): SearchPage
@@ -37,6 +39,11 @@ interface MediaRepository {
     suspend fun updateLibraryStatus(mediaId: Int, status: LibraryStatus): Boolean
 
     suspend fun removeFromLibrary(mediaId: Int): Boolean
+
+    // null means the fetch failed, sorted by orderIndex before it comes back
+    suspend fun getPriorities(): List<Priority>?
+
+    suspend fun setPriority(request: UpdatePriorityRequest): Boolean
 
     suspend fun postReview(
         mediaId: Int,
