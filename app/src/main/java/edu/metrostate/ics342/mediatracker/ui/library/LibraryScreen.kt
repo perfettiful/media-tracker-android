@@ -27,6 +27,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.SubcomposeAsyncImage
 import edu.metrostate.ics342.mediatracker.data.model.LibraryItem
 import edu.metrostate.ics342.mediatracker.data.model.LibraryStatus
+import edu.metrostate.ics342.mediatracker.data.model.PriorityLevel
 import edu.metrostate.ics342.mediatracker.data.model.creatorCredit
 import edu.metrostate.ics342.mediatracker.ui.StatusBadge
 import edu.metrostate.ics342.mediatracker.ui.search.MediaTypeFilterChips
@@ -201,7 +202,10 @@ fun LibraryScreen(
                     item           = item,
                     onClick        = { onMediaClick(item.mediaId) },
                     onRemove       = { viewModel.removeItem(item.mediaId) },
-                    onStatusChange = { newStatus -> viewModel.updateStatus(item.mediaId, newStatus) }
+                    onStatusChange = { newStatus -> viewModel.updateStatus(item.mediaId, newStatus) },
+                    onSetPriority  = { level, hours, notes ->
+                        viewModel.setPriority(item.mediaId, level, hours, notes)
+                    }
                 )
             }
         }
@@ -210,14 +214,103 @@ fun LibraryScreen(
 }
 
 @Composable
+private fun SetPriorityDialog(
+    title: String,
+    onDismiss: () -> Unit,
+    onConfirm: (PriorityLevel, Int?, String?) -> Unit,
+) {
+    var level by remember { mutableStateOf(PriorityLevel.MEDIUM) }
+    var hours by remember { mutableStateOf("") }
+    var notes by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(edu.metrostate.ics342.mediatracker.R.string.priority_dialog_title)) },
+        text = {
+            Column {
+                Text(title, style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+
+                Spacer(Modifier.height(12.dp))
+
+                SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                    PriorityLevel.entries.forEachIndexed { index, entry ->
+                        SegmentedButton(
+                            shape    = SegmentedButtonDefaults.itemShape(index = index, count = PriorityLevel.entries.size),
+                            selected = level == entry,
+                            onClick  = { level = entry },
+                            colors   = SegmentedButtonDefaults.colors(
+                                activeContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                activeContentColor   = MaterialTheme.colorScheme.onPrimaryContainer,
+                            ),
+                            label = { Text(stringResource(when (entry) {
+                                PriorityLevel.HIGH   -> edu.metrostate.ics342.mediatracker.R.string.priority_high
+                                PriorityLevel.MEDIUM -> edu.metrostate.ics342.mediatracker.R.string.priority_medium
+                                PriorityLevel.LOW    -> edu.metrostate.ics342.mediatracker.R.string.priority_low
+                            })) }
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(12.dp))
+
+                OutlinedTextField(
+                    value = hours,
+                    // api only takes whole hours, a decimal 500s
+                    onValueChange = { typed -> hours = typed.filter { it.isDigit() }.take(3) },
+                    label = { Text(stringResource(edu.metrostate.ics342.mediatracker.R.string.priority_hours_label)) },
+                    singleLine = true,
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(Modifier.height(8.dp))
+
+                OutlinedTextField(
+                    value = notes,
+                    onValueChange = { if (it.length <= 200) notes = it },
+                    label = { Text(stringResource(edu.metrostate.ics342.mediatracker.R.string.priority_notes_label)) },
+                    singleLine = true,
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { onConfirm(level, hours.toIntOrNull(), notes) }) {
+                Text(stringResource(edu.metrostate.ics342.mediatracker.R.string.priority_dialog_save))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(edu.metrostate.ics342.mediatracker.R.string.settings_cancel_button))
+            }
+        }
+    )
+}
+
+@Composable
 private fun LibraryItemCard(
     item: LibraryItem,
     onClick: () -> Unit,
     onRemove: () -> Unit,
-    onStatusChange: (LibraryStatus) -> Unit
+    onStatusChange: (LibraryStatus) -> Unit,
+    onSetPriority: (PriorityLevel, Int?, String?) -> Unit
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
     var statusDialogVisible by remember { mutableStateOf(false) }
+    var priorityDialogVisible by remember { mutableStateOf(false) }
+
+    if (priorityDialogVisible) {
+        SetPriorityDialog(
+            title      = item.media.title,
+            onDismiss  = { priorityDialogVisible = false },
+            onConfirm  = { level, hours, notes ->
+                onSetPriority(level, hours, notes)
+                priorityDialogVisible = false
+            }
+        )
+    }
 
     if (statusDialogVisible) {
         AlertDialog(
@@ -297,6 +390,13 @@ private fun LibraryItemCard(
                         text    = { Text(stringResource(edu.metrostate.ics342.mediatracker.R.string.action_change_status)) },
                         onClick = { menuExpanded = false; statusDialogVisible = true }
                     )
+                    // priorities only make sense for stuff you havent started
+                    if (item.status == LibraryStatus.WANT_TO) {
+                        DropdownMenuItem(
+                            text    = { Text(stringResource(edu.metrostate.ics342.mediatracker.R.string.action_set_priority)) },
+                            onClick = { menuExpanded = false; priorityDialogVisible = true }
+                        )
+                    }
                     DropdownMenuItem(
                         text    = { Text(stringResource(edu.metrostate.ics342.mediatracker.R.string.action_remove_from_library),
                             color = MaterialTheme.colorScheme.error) },
