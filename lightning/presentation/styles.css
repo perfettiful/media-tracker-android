@@ -1,0 +1,186 @@
+/* small overrides on reveal's black theme to match the app:
+   near-black bg, mint + orange highlights */
+
+:root {
+  --r-background-color: #0d0d0f;
+  --r-main-color: #e8e8ea;
+  --r-heading-color: #ffffff;
+  --r-link-color: #33d6a6;
+  --r-link-color-hover: #66e2bd;
+  --mint: #33d6a6;
+  --orange: #ff9f0a;
+}
+
+/* standard slides: heading top left, body flows underneath */
+.reveal .slides section {
+  text-align: left;
+  padding-top: 1em;
+}
+
+/* the title and closing slides stay full centered.
+   scoped to .present so reveal can still hide the others */
+.reveal .slides section.centered.present {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  height: 100%;
+  padding-top: 0;
+}
+
+.reveal .kicker {
+  color: var(--mint);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.45em;
+  font-weight: 600;
+  margin-bottom: 0.8em;
+}
+
+.reveal h1 {
+  font-size: 3.2em;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-transform: none;
+}
+
+.reveal h2 {
+  font-size: 1.35em;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  text-transform: none;
+}
+
+.reveal h2 code {
+  font-size: 0.9em;
+  color: var(--orange);
+}
+
+.reveal h3, .reveal h4 {
+  text-transform: none;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.reveal h3 code, .reveal h4 code {
+  font-size: 0.9em;
+  color: var(--orange);
+}
+
+.reveal .subtitle {
+  color: #8e8e93;
+  font-size: 0.7em;
+}
+
+/* bullets, when they get written. 6 words per line, 6 lines max */
+.reveal ul {
+  list-style: none;
+  margin-left: 0;
+  font-size: 0.68em;
+  line-height: 1.55;
+}
+
+.reveal ul li {
+  margin-bottom: 0.45em;
+}
+
+.reveal ul li {
+  padding-left: 1.1em;
+  text-indent: -1.1em;
+}
+
+.reveal ul li::before {
+  content: "-";
+  color: var(--orange);
+  margin-right: 0.5em;
+}
+
+.reveal .progress {
+  color: var(--mint);
+}
+
+/* two column slide bodies: bullets left, visual right */
+.reveal .split {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  margin-top: 0.6em;
+}
+
+.reveal .split .col {
+  flex: 1;
+  min-width: 0;
+}
+
+.reveal .split ul {
+  margin-top: 0;
+}
+
+/* px not vh: reveal scales the whole deck with a transform, so
+   viewport units double-scale on big monitors and overflow the slide */
+.reveal .split img.phone {
+  max-height: 400px;
+  width: auto;
+  border-radius: 18px;
+  border: 1px solid #2a2a2e;
+  flex: 0 0 auto;
+}
+
+.reveal .title-icon {
+  width: 120px;
+  border-radius: 27px;
+  margin-top: 0.6em;
+}
+
+.reveal pre.snippet {
+  font-size: 0.42em;
+  line-height: 1.55;
+  background: #17171a;
+  border-radius: 10px;
+  padding: 1em 1.2em;
+  width: 100%;
+  box-shadow: none;
+}
+
+.reveal pre.snippet code {
+  color: #cfcfd4;
+}
+
+.reveal img.meme {
+  max-height: 330px;
+  max-width: 42%;
+  border-radius: 10px;
+  flex: 0 0 auto;
+}
+
+.reveal table {
+  font-size: 0.55em;
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 0.5em;
+}
+
+.reveal table th {
+  color: var(--mint);
+  border-bottom: 2px solid var(--mint);
+  padding: 0.4em 0.6em;
+  text-align: left;
+}
+
+.reveal table td {
+  border-bottom: 1px solid #2a2a2e;
+  padding: 0.4em 0.6em;
+}
+
+/* default position collides with the nav arrows, park it bottom-left */
+.reveal .slide-number {
+  right: auto;
+  left: 16px;
+  bottom: 14px;
+  background: none;
+  color: #8e8e93;
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
