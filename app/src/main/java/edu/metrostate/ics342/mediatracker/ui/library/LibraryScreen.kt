@@ -9,6 +9,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -35,6 +36,7 @@ import edu.metrostate.ics342.mediatracker.ui.search.MediaTypeTile
 @Composable
 fun LibraryScreen(
     onMediaClick: (Int) -> Unit,
+    onPrioritiesClick: () -> Unit,
     viewModel: LibraryViewModel = viewModel()
 ) {
     val items          by viewModel.libraryItems.collectAsState()
@@ -92,7 +94,14 @@ fun LibraryScreen(
         },
     ) { innerPadding ->
     Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
-        TopAppBar(title = { Text(stringResource(edu.metrostate.ics342.mediatracker.R.string.library_title)) })
+        TopAppBar(
+            title   = { Text(stringResource(edu.metrostate.ics342.mediatracker.R.string.library_title)) },
+            actions = {
+                IconButton(onClick = onPrioritiesClick) {
+                    Icon(Icons.Outlined.Tune, stringResource(edu.metrostate.ics342.mediatracker.R.string.priorities_action))
+                }
+            }
+        )
 
         MediaTypeFilterChips(
             selectedType = selectedType,

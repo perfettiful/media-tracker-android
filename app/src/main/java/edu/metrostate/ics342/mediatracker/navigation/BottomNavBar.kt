@@ -60,7 +60,9 @@ fun BottomNavBar(navController: NavController) {
 
     NavigationBar {
         bottomNavItems.forEach { item ->
-            val isSelected = currentDestination?.hierarchy?.any { it.route == item.route } == true
+            // priorities hangs off library, keep that tab lit while youre in there
+            val isSelected = currentDestination?.hierarchy?.any { it.route == item.route } == true ||
+                (item.route == Routes.LIBRARY && currentDestination?.route == Routes.PRIORITIES)
 
             NavigationBarItem(
                 selected = isSelected,
