@@ -5,7 +5,10 @@ import edu.metrostate.ics342.mediatracker.data.MediaRepository
 import edu.metrostate.ics342.mediatracker.data.model.LibraryItem
 import edu.metrostate.ics342.mediatracker.data.model.LibraryStatus
 import edu.metrostate.ics342.mediatracker.data.model.Media
+import edu.metrostate.ics342.mediatracker.data.model.PriorityLevel
+import edu.metrostate.ics342.mediatracker.R
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -43,6 +46,37 @@ class LibraryViewModelTest {
         updatedAt = "2026-07-23T00:00:00Z",
         media     = Media(id = id, mediaType = "movie", title = "Dune"),
     )
+
+    private fun priority(mediaId: Int) = edu.metrostate.ics342.mediatracker.data.model.Priority(
+        mediaId    = mediaId,
+        priority   = 1,
+        orderIndex = 0,
+    )
+
+    @Test
+    fun `a sixth priority never reaches the api`() {
+        coEvery { repo.getLibrary(any()) } returns LibraryResult.Success(listOf(dune(1)))
+        // already at the cap with five other things
+        coEvery { repo.getPriorities() } returns (10..14).map { priority(it) }
+        val viewModel = LibraryViewModel(repo)
+
+        viewModel.setPriority(1, PriorityLevel.HIGH, 3, "nope")
+
+        coVerify(exactly = 0) { repo.setPriority(any()) }
+        assertEquals(R.string.priorities_full, viewModel.actionError.value)
+    }
+
+    @Test
+    fun `editing one thats already on the list still works at the cap`() {
+        coEvery { repo.getLibrary(any()) } returns LibraryResult.Success(listOf(dune(1)))
+        coEvery { repo.getPriorities() } returns listOf(priority(1)) + (10..13).map { priority(it) }
+        coEvery { repo.setPriority(any()) } returns true
+        val viewModel = LibraryViewModel(repo)
+
+        viewModel.setPriority(1, PriorityLevel.HIGH, 3, "still fine")
+
+        coVerify(exactly = 1) { repo.setPriority(any()) }
+    }
 
     @Test
     fun `remove takes the item out of the list right away`() {
