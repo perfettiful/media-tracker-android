@@ -34,7 +34,7 @@ His repo layer is the strongest part. `createReview` returns a `Result<Review>` 
 
 ### Comments I Left
 
-Four. Props on the Result plus 409 handling and the star row, then the no-feedback-on-success bug, the `shareToFeed` flag that is always false, and the Post button that should be disabled until a star is picked.
+I left a few. For example, giving props on the Result plus 409 handling and the star row, then the no-feedback-on-success bug, the `shareToFeed` flag that is always false, and the Post button that should be disabled until a star is picked.
 
 ---
 
