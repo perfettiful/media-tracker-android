@@ -7,6 +7,7 @@ import edu.metrostate.ics342.mediatracker.data.LibraryResult
 import edu.metrostate.ics342.mediatracker.data.MediaRepository
 import edu.metrostate.ics342.mediatracker.data.model.LibraryItem
 import edu.metrostate.ics342.mediatracker.data.model.LibraryStatus
+import edu.metrostate.ics342.mediatracker.data.model.MAX_PRIORITIES
 import edu.metrostate.ics342.mediatracker.data.model.PriorityLevel
 import edu.metrostate.ics342.mediatracker.data.model.UpdatePriorityRequest
 import edu.metrostate.ics342.mediatracker.data.network.DefaultMediaRepository
@@ -36,11 +37,17 @@ class LibraryViewModel(
     private val _undoCandidate = MutableStateFlow<LibraryItem?>(null)
     val undoCandidate: StateFlow<LibraryItem?> = _undoCandidate.asStateFlow()
 
+    // which items are already on the priority list, so the menu knows what to offer.
+    // the api caps it at 5 and there is no way to delete one, so dont let people fill it blind
+    private val _prioritizedIds = MutableStateFlow<Set<Int>>(emptySet())
+    val prioritizedIds: StateFlow<Set<Int>> = _prioritizedIds.asStateFlow()
+
     private val _filterState = MutableStateFlow(LibraryStatus.WANT_TO)
     val filterState: StateFlow<LibraryStatus> = _filterState.asStateFlow()
 
     init {
         loadLibrary()
+        refreshPriorities()
     }
 
     fun loadLibrary() {
@@ -126,12 +133,26 @@ class LibraryViewModel(
         }
     }
 
+    fun refreshPriorities() {
+        viewModelScope.launch {
+            mediaRepository.getPriorities()?.let { loaded ->
+                _prioritizedIds.value = loaded.map { it.mediaId }.toSet()
+            }
+        }
+    }
+
     // new entries go on the end of the list, an existing one keeps the spot it had.
     // PUT overwrites the whole row so hours and notes ride along every time
     fun setPriority(mediaId: Int, level: PriorityLevel, estimatedHours: Int?, notes: String?) {
         viewModelScope.launch {
             val existing = mediaRepository.getPriorities()
             val alreadyThere = existing?.find { it.mediaId == mediaId }
+            // catch the cap here too, the menu hides the action but state can go stale
+            if (alreadyThere == null && (existing?.size ?: 0) >= MAX_PRIORITIES) {
+                _prioritizedIds.value = existing?.map { it.mediaId }?.toSet() ?: _prioritizedIds.value
+                _actionError.value = R.string.priorities_full
+                return@launch
+            }
             val saved = mediaRepository.setPriority(
                 UpdatePriorityRequest(
                     mediaId            = mediaId,
@@ -141,6 +162,7 @@ class LibraryViewModel(
                     notes              = notes?.takeIf { it.isNotBlank() },
                 )
             )
+            if (saved) _prioritizedIds.value = _prioritizedIds.value + mediaId
             _actionError.value = if (saved) R.string.priorities_saved else R.string.priorities_save_failed
         }
     }

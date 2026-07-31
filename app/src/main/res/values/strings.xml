@@ -77,6 +77,8 @@
     <string name="priority_badge_medium">Medium Priority</string>
     <string name="priority_badge_low">Low Priority</string>
     <string name="action_set_priority">Set priority</string>
+    <string name="action_edit_priority">Edit priority</string>
+    <string name="priorities_full_hint">Priority list is full (5).</string>
     <string name="priority_dialog_title">Set priority</string>
     <string name="priority_dialog_save">Save</string>
     <string name="priority_hours_label">Estimated hours</string>
