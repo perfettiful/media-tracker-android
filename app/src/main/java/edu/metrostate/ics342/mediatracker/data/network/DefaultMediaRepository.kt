@@ -10,8 +10,10 @@ import edu.metrostate.ics342.mediatracker.data.model.AddLibraryRequest
 import edu.metrostate.ics342.mediatracker.data.model.AddReviewRequest
 import edu.metrostate.ics342.mediatracker.data.model.Favorite
 import edu.metrostate.ics342.mediatracker.data.model.LibraryStatus
+import edu.metrostate.ics342.mediatracker.data.model.Priority
 import edu.metrostate.ics342.mediatracker.data.model.Review
 import edu.metrostate.ics342.mediatracker.data.model.UpdateLibraryRequest
+import edu.metrostate.ics342.mediatracker.data.model.UpdatePriorityRequest
 import java.io.IOException
 
 class DefaultMediaRepository(
@@ -117,6 +119,24 @@ class DefaultMediaRepository(
             val response = service.removeFavorite(mediaId)
             // 404 means it was never saved, end state is the same
             response.isSuccessful || response.code() == 404
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    override suspend fun getPriorities(): List<Priority>? {
+        return try {
+            val response = service.getPriorities()
+            // the api sorts by orderIndex already but dont bet the ui on it
+            if (response.isSuccessful) response.body()?.sortedBy { it.orderIndex } else null
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    override suspend fun setPriority(request: UpdatePriorityRequest): Boolean {
+        return try {
+            service.updatePriority(request).isSuccessful
         } catch (e: Exception) {
             false
         }

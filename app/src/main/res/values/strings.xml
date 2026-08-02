@@ -59,6 +59,27 @@
     <string name="action_change_status">Change status</string>
     <string name="action_remove_from_library">Remove from library</string>
 
+    <!-- Priorities -->
+    <string name="priorities_title">Priorities</string>
+    <string name="priorities_action">Priorities</string>
+    <string name="priorities_empty">No priorities set. Mark a \'Want To\' item as a priority to see it here.</string>
+    <string name="priorities_failed">Couldn\'t load your priorities. Try again.</string>
+    <string name="priorities_est_hours">Est. %1$d hours</string>
+    <string name="priorities_unknown_title">Untitled</string>
+    <string name="priority_high">High</string>
+    <string name="priority_medium">Medium</string>
+    <string name="priority_low">Low</string>
+    <string name="priority_badge_high">High Priority</string>
+    <string name="priority_badge_medium">Medium Priority</string>
+    <string name="priority_badge_low">Low Priority</string>
+    <string name="action_set_priority">Set priority</string>
+    <string name="priority_dialog_title">Set priority</string>
+    <string name="priority_dialog_save">Save</string>
+    <string name="priority_hours_label">Estimated hours</string>
+    <string name="priority_notes_label">Notes (optional)</string>
+    <string name="priorities_saved">Added to your priorities.</string>
+    <string name="priorities_save_failed">Couldn\'t save that priority. Try again.</string>
+
     <!-- Profile -->
     <string name="profile_title">Profile</string>
     <string name="profile_settings">Settings</string>

@@ -7,6 +7,8 @@ import edu.metrostate.ics342.mediatracker.data.LibraryResult
 import edu.metrostate.ics342.mediatracker.data.MediaRepository
 import edu.metrostate.ics342.mediatracker.data.model.LibraryItem
 import edu.metrostate.ics342.mediatracker.data.model.LibraryStatus
+import edu.metrostate.ics342.mediatracker.data.model.PriorityLevel
+import edu.metrostate.ics342.mediatracker.data.model.UpdatePriorityRequest
 import edu.metrostate.ics342.mediatracker.data.network.DefaultMediaRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -121,6 +123,25 @@ class LibraryViewModel(
                 _libraryItems.value = backup
                 _actionError.value = R.string.library_status_failed
             }
+        }
+    }
+
+    // new entries go on the end of the list, an existing one keeps the spot it had.
+    // PUT overwrites the whole row so hours and notes ride along every time
+    fun setPriority(mediaId: Int, level: PriorityLevel, estimatedHours: Int?, notes: String?) {
+        viewModelScope.launch {
+            val existing = mediaRepository.getPriorities()
+            val alreadyThere = existing?.find { it.mediaId == mediaId }
+            val saved = mediaRepository.setPriority(
+                UpdatePriorityRequest(
+                    mediaId            = mediaId,
+                    priority           = level.apiValue,
+                    orderIndex         = alreadyThere?.orderIndex ?: (existing?.size ?: 0),
+                    estimatedTimeHours = estimatedHours,
+                    notes              = notes?.takeIf { it.isNotBlank() },
+                )
+            )
+            _actionError.value = if (saved) R.string.priorities_saved else R.string.priorities_save_failed
         }
     }
 

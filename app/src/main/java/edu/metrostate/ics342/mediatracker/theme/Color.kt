@@ -37,6 +37,12 @@ val InProgressContainer = Color(0xFFDBEAFE)
 val Finished            = Color(0xFF059669)
 val FinishedContainer   = Color(0xFFD1FAE5)
 
+// Priority filter dots. the badges reuse the status colors above per the wireframe,
+// these are just the little circles on the chips
+val PriorityHighDot   = Color(0xFFDC2626)
+val PriorityMediumDot = Color(0xFFEAB308)
+val PriorityLowDot    = Color(0xFF22C55E)
+
 // Dark theme
 val DarkBackground       = Color(0xFF0F0F1A)
 val DarkSurface          = Color(0xFF1A1A2E)

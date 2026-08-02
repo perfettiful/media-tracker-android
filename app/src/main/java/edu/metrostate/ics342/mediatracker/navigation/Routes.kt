@@ -6,6 +6,7 @@ object Routes {
     const val ACTIVITY_FEED = "activity_feed"
     const val SEARCH        = "search"
     const val LIBRARY       = "library"
+    const val PRIORITIES    = "priorities"
     const val CONNECTIONS   = "connections"
     const val MY_PROFILE    = "my_profile"
     const val SETTINGS      = "settings"
