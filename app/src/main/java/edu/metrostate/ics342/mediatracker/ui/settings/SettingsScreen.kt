@@ -15,12 +15,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import edu.metrostate.ics342.mediatracker.data.FakeMediaRepository
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    onSignOut: () -> Unit
+    onSignOut: () -> Unit,
+    viewModel: SettingsViewModel = viewModel(factory = SettingsViewModel.Factory)
 ) {
     var signOutDialogVisible by remember { mutableStateOf(false) }
     var darkModeEnabled by remember { mutableStateOf(false) }
@@ -31,7 +33,7 @@ fun SettingsScreen(
             title            = { Text(stringResource(edu.metrostate.ics342.mediatracker.R.string.settings_sign_out_confirm_title)) },
             text             = { Text(stringResource(edu.metrostate.ics342.mediatracker.R.string.settings_sign_out_confirm_message)) },
             confirmButton    = {
-                TextButton(onClick = { signOutDialogVisible = false; onSignOut() }) {
+                TextButton(onClick = { signOutDialogVisible = false; viewModel.signOut(onSignOut) }) {
                     Text(stringResource(edu.metrostate.ics342.mediatracker.R.string.settings_sign_out_button), color = MaterialTheme.colorScheme.error)
                 }
             },
