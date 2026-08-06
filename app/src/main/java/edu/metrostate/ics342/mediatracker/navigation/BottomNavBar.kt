@@ -67,8 +67,11 @@ fun BottomNavBar(navController: NavController) {
             NavigationBarItem(
                 selected = isSelected,
                 onClick  = {
+                    // the graph starts on login and login gets popped once youre in,
+                    // so popping to the start destination bounced you back to it.
+                    // feed is the real home of the tabs
                     navController.navigate(item.route) {
-                        popUpTo(navController.graph.startDestinationId) { saveState = true }
+                        popUpTo(Routes.ACTIVITY_FEED) { saveState = true }
                         launchSingleTop = true
                         restoreState    = true
                     }
