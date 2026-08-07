@@ -2,23 +2,29 @@ package edu.metrostate.ics342.mediatracker.ui.priorities
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.DragIndicator
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -48,7 +54,17 @@ fun PrioritiesScreen(
     val priorities   by viewModel.priorities.collectAsState()
     val isLoading    by viewModel.isLoading.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
+    val actionError  by viewModel.actionError.collectAsState()
     val levelFilter  by viewModel.levelFilter.collectAsState()
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val actionErrorText = actionError?.let { stringResource(it) }
+    LaunchedEffect(actionErrorText) {
+        actionErrorText?.let {
+            snackbarHostState.showSnackbar(message = it, duration = SnackbarDuration.Short)
+            viewModel.clearActionError()
+        }
+    }
 
     // someone may have set a priority from the library while we were away
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -60,7 +76,20 @@ fun PrioritiesScreen(
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(snackbarHostState) { data ->
+                Snackbar(
+                    snackbarData   = data,
+                    modifier       = Modifier.padding(12.dp),
+                    shape          = RoundedCornerShape(12.dp),
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor   = MaterialTheme.colorScheme.onPrimaryContainer,
+                )
+            }
+        },
+    ) { innerPadding ->
+    Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
         TopAppBar(
             title = { Text(stringResource(R.string.priorities_title)) },
             navigationIcon = {
@@ -120,14 +149,87 @@ fun PrioritiesScreen(
             return@Column
         }
 
+        // reordering the whole list only makes sense when youre looking at the whole list
+        val canReorder = levelFilter == null
+
+        if (canReorder && shown.size > 1) {
+            Text(
+                stringResource(R.string.priorities_drag_hint),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+            )
+        }
+
+        val listState = rememberLazyListState()
+        var draggedIndex by remember { mutableStateOf<Int?>(null) }
+        var dragOffset   by remember { mutableFloatStateOf(0f) }
+
         LazyColumn(
+            state = listState,
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = if (!canReorder) Modifier else Modifier.pointerInput(shown.size) {
+                detectDragGesturesAfterLongPress(
+                    onDragStart = { touch ->
+                        draggedIndex = listState.layoutInfo.visibleItemsInfo
+                            .firstOrNull { touch.y.toInt() in it.offset..(it.offset + it.size) }
+                            ?.index
+                        dragOffset = 0f
+                        if (draggedIndex != null) viewModel.beginDrag()
+                    },
+                    onDrag = { change, amount ->
+                        change.consume()
+                        val from = draggedIndex ?: return@detectDragGesturesAfterLongPress
+                        dragOffset += amount.y
+                        // once youve dragged past a whole card, swap with that neighbour
+                        // and keep the leftover so the card stays under your finger
+                        val card = listState.layoutInfo.visibleItemsInfo.firstOrNull { it.index == from }
+                            ?: return@detectDragGesturesAfterLongPress
+                        val step = card.size + 8.dp.toPx()
+                        when {
+                            dragOffset > step && from < shown.lastIndex -> {
+                                viewModel.moveItem(from, from + 1)
+                                draggedIndex = from + 1
+                                dragOffset -= step
+                            }
+                            dragOffset < -step && from > 0 -> {
+                                viewModel.moveItem(from, from - 1)
+                                draggedIndex = from - 1
+                                dragOffset += step
+                            }
+                        }
+                    },
+                    onDragEnd = {
+                        draggedIndex = null
+                        dragOffset = 0f
+                        viewModel.saveOrder()
+                    },
+                    onDragCancel = {
+                        draggedIndex = null
+                        dragOffset = 0f
+                        viewModel.saveOrder()
+                    }
+                )
+            }
         ) {
-            items(shown, key = { it.mediaId }) { priority ->
-                PriorityCard(priority = priority, onClick = { onMediaClick(priority.mediaId) })
+            itemsIndexed(shown, key = { _, item -> item.mediaId }) { index, priority ->
+                val beingDragged = index == draggedIndex
+                PriorityCard(
+                    priority   = priority,
+                    showHandle = canReorder,
+                    onClick    = { onMediaClick(priority.mediaId) },
+                    modifier   = Modifier
+                        .zIndex(if (beingDragged) 1f else 0f)
+                        .graphicsLayer {
+                            translationY = if (beingDragged) dragOffset else 0f
+                            scaleX = if (beingDragged) 1.02f else 1f
+                            scaleY = if (beingDragged) 1.02f else 1f
+                        }
+                )
             }
         }
+    }
     }
 }
 
@@ -167,14 +269,27 @@ private fun PriorityFilterChips(
 }
 
 @Composable
-private fun PriorityCard(priority: Priority, onClick: () -> Unit) {
+private fun PriorityCard(
+    priority: Priority,
+    showHandle: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Card(
-        modifier  = Modifier.fillMaxWidth().clickable { onClick() },
+        modifier  = modifier.fillMaxWidth().clickable { onClick() },
         shape     = RoundedCornerShape(12.dp),
         colors    = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+            if (showHandle) {
+                Icon(
+                    Icons.Outlined.DragIndicator,
+                    contentDescription = stringResource(R.string.priorities_drag_handle),
+                    tint = MaterialTheme.colorScheme.outline,
+                    modifier = Modifier.padding(end = 8.dp)
+                )
+            }
             Box(
                 modifier = Modifier.size(64.dp, 90.dp).clip(RoundedCornerShape(6.dp)),
                 contentAlignment = Alignment.Center

@@ -27,6 +27,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.SubcomposeAsyncImage
 import edu.metrostate.ics342.mediatracker.data.model.LibraryItem
 import edu.metrostate.ics342.mediatracker.data.model.LibraryStatus
+import edu.metrostate.ics342.mediatracker.data.model.MAX_PRIORITIES
 import edu.metrostate.ics342.mediatracker.data.model.PriorityLevel
 import edu.metrostate.ics342.mediatracker.data.model.creatorCredit
 import edu.metrostate.ics342.mediatracker.ui.StatusBadge
@@ -44,6 +45,7 @@ fun LibraryScreen(
     val isLoading      by viewModel.isLoading.collectAsState()
     val errorMessage   by viewModel.errorMessage.collectAsState()
     val actionError    by viewModel.actionError.collectAsState()
+    val prioritizedIds by viewModel.prioritizedIds.collectAsState()
     val selectedStatus by viewModel.filterState.collectAsState()
 
     var selectedType by rememberSaveable { mutableStateOf("all") }
@@ -75,7 +77,10 @@ fun LibraryScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) viewModel.refresh()
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.refresh()
+                viewModel.refreshPriorities()
+            }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
@@ -199,11 +204,14 @@ fun LibraryScreen(
         ) {
             items(filteredItems, key = { it.mediaId }) { item ->
                 LibraryItemCard(
-                    item           = item,
-                    onClick        = { onMediaClick(item.mediaId) },
-                    onRemove       = { viewModel.removeItem(item.mediaId) },
-                    onStatusChange = { newStatus -> viewModel.updateStatus(item.mediaId, newStatus) },
-                    onSetPriority  = { level, hours, notes ->
+                    item             = item,
+                    // editing one you already set is fine even at the cap, only new ones are blocked
+                    canSetPriority   = item.mediaId in prioritizedIds || prioritizedIds.size < MAX_PRIORITIES,
+                    alreadyPrioritized = item.mediaId in prioritizedIds,
+                    onClick          = { onMediaClick(item.mediaId) },
+                    onRemove         = { viewModel.removeItem(item.mediaId) },
+                    onStatusChange   = { newStatus -> viewModel.updateStatus(item.mediaId, newStatus) },
+                    onSetPriority    = { level, hours, notes ->
                         viewModel.setPriority(item.mediaId, level, hours, notes)
                     }
                 )
@@ -292,6 +300,8 @@ private fun SetPriorityDialog(
 @Composable
 private fun LibraryItemCard(
     item: LibraryItem,
+    canSetPriority: Boolean,
+    alreadyPrioritized: Boolean,
     onClick: () -> Unit,
     onRemove: () -> Unit,
     onStatusChange: (LibraryStatus) -> Unit,
@@ -390,12 +400,27 @@ private fun LibraryItemCard(
                         text    = { Text(stringResource(edu.metrostate.ics342.mediatracker.R.string.action_change_status)) },
                         onClick = { menuExpanded = false; statusDialogVisible = true }
                     )
-                    // priorities only make sense for stuff you havent started
+                    // priorities only make sense for stuff you havent started, and the
+                    // list is capped at 5 so a new one gets greyed out once its full
                     if (item.status == LibraryStatus.WANT_TO) {
                         DropdownMenuItem(
-                            text    = { Text(stringResource(edu.metrostate.ics342.mediatracker.R.string.action_set_priority)) },
+                            enabled = canSetPriority,
+                            text    = {
+                                Text(stringResource(
+                                    if (alreadyPrioritized) edu.metrostate.ics342.mediatracker.R.string.action_edit_priority
+                                    else edu.metrostate.ics342.mediatracker.R.string.action_set_priority
+                                ))
+                            },
                             onClick = { menuExpanded = false; priorityDialogVisible = true }
                         )
+                        if (!canSetPriority) {
+                            Text(
+                                stringResource(edu.metrostate.ics342.mediatracker.R.string.priorities_full_hint),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(horizontal = 12.dp).width(180.dp)
+                            )
+                        }
                     }
                     DropdownMenuItem(
                         text    = { Text(stringResource(edu.metrostate.ics342.mediatracker.R.string.action_remove_from_library),

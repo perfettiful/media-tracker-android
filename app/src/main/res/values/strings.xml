@@ -65,6 +65,10 @@
     <string name="priorities_empty">No priorities set. Mark a \'Want To\' item as a priority to see it here.</string>
     <string name="priorities_failed">Couldn\'t load your priorities. Try again.</string>
     <string name="priorities_est_hours">Est. %1$d hours</string>
+    <string name="priorities_drag_hint">Drag to reorder</string>
+    <string name="priorities_drag_handle">Drag to reorder</string>
+    <string name="priorities_reorder_failed">Couldn\'t save the new order. Try again.</string>
+    <string name="priorities_full">You can have 5 priorities. Change one you already set instead.</string>
     <string name="priorities_unknown_title">Untitled</string>
     <string name="priority_high">High</string>
     <string name="priority_medium">Medium</string>
@@ -73,6 +77,8 @@
     <string name="priority_badge_medium">Medium Priority</string>
     <string name="priority_badge_low">Low Priority</string>
     <string name="action_set_priority">Set priority</string>
+    <string name="action_edit_priority">Edit priority</string>
+    <string name="priorities_full_hint">Priority list is full (5).</string>
     <string name="priority_dialog_title">Set priority</string>
     <string name="priority_dialog_save">Save</string>
     <string name="priority_hours_label">Estimated hours</string>
