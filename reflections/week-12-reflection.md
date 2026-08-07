@@ -18,21 +18,22 @@ https://github.com/perfettiful/media-tracker-android/pull/14
 
 ## Code Review
 
-**Reviewed:** *(pod mate's name)*
+**Reviewed:** *()*
 
 **Link to my review:**
 
+
 ### What I Looked At
 
-*(fill in after doing the review)*
+
 
 ### What I Noticed
 
-*(fill in after doing the review)*
+
 
 ### Comments I Left
 
-*(fill in after doing the review)*
+
 
 ---
 
