@@ -30,3 +30,10 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Lightning exploration (Week 13)
+# rn-lightning is its own git repo, tracked separately
+lightning/rn-lightning/
+node_modules/
+xcuserdata/
+DerivedData/
